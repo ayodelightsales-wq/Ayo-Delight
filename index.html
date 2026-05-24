@@ -42,16 +42,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .btn-red{background:#e53e3e;color:#fff}.btn-red:hover{background:#c53030}
 
 /* HERO */
-.hero{display:grid;grid-template-columns:1fr 1fr;min-height:88vh;overflow:hidden}
-.hero-left{background:var(--green-light);display:flex;flex-direction:column;justify-content:center;padding:4rem 3.5rem}
+/* FULL WIDTH BANNER */
+.hero{position:relative;width:100%;min-height:520px;overflow:hidden;display:flex;align-items:center}
+.hero-bg{position:absolute;inset:0;background:var(--green-light);background-size:cover;background-position:center;z-index:0;transition:all .3s}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(238,245,232,.95) 0%,rgba(238,245,232,.85) 40%,rgba(238,245,232,.2) 70%,transparent 100%)}
+.hero-left{position:relative;z-index:1;padding:4rem 3.5rem;max-width:600px}
 .hero-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green-dark);margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
 .hero-tag::before{content:'';width:24px;height:1px;background:var(--green)}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.05;margin-bottom:.5rem}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:58px;font-weight:300;line-height:1.05;margin-bottom:.5rem}
 .hero-title em{font-style:italic;color:var(--green)}
 .hero-title-ar{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--muted);direction:rtl;margin-bottom:1.5rem}
-.hero-sub{font-size:13px;font-weight:300;color:var(--muted);line-height:1.9;max-width:380px;margin-bottom:2.5rem}
-.hero-right{background:#D4E8C2;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.hero-badge{position:absolute;bottom:2.5rem;right:2rem;background:#fff;padding:14px 20px}
+.hero-sub{font-size:13px;font-weight:300;color:var(--muted);line-height:1.9;max-width:400px;margin-bottom:2.5rem}
+.hero-right{display:none}
+.hero-badge{position:absolute;bottom:2rem;right:2rem;z-index:2;background:rgba(255,255,255,.92);padding:14px 20px;backdrop-filter:blur(4px)}
 .hero-badge strong{display:block;font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:400;color:var(--green-dark)}
 .hero-badge span{font-size:11px;color:var(--muted);letter-spacing:1px}
 
@@ -226,12 +229,13 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .mob-menu.open{display:block}
 @media(max-width:768px){
   nav{padding:.8rem 1.2rem}.nav-links{display:none}.mob-menu-btn{display:block}
-  .hero{grid-template-columns:1fr;min-height:auto}
-  .hero-left{padding:2.5rem 1.5rem}
-  .hero-title{font-size:36px}
-  .hero-right{display:none}
-  .hero-title-ar{font-size:22px}
+  .hero{min-height:380px}
+  .hero-left{padding:2rem 1.5rem}
+  .hero-title{font-size:34px}
+  .hero-bg::after{background:linear-gradient(180deg,rgba(238,245,232,.97) 0%,rgba(238,245,232,.9) 60%,rgba(238,245,232,.5) 100%)}
+  .hero-title-ar{font-size:20px}
   .hero-sub{font-size:12px}
+  .hero-badge{display:none}
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .section{padding:3rem 1.2rem}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
@@ -304,32 +308,19 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 
 <!-- ════════════ HOME ════════════ -->
 <div id="page-home" class="page active">
-  <div class="hero">
+  <div class="hero" id="main-hero">
+    <div class="hero-bg" id="hero-bg"></div>
     <div class="hero-left">
-      <p class="hero-tag">100% Natural &amp; Organic</p>
-      <h1 class="hero-title">Nature's Finest,<br><em>Your Delight</em></h1>
-      <p class="hero-title-ar">أفضل ما في الطبيعة، بهجتك أنت</p>
-      <p class="hero-sub">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</p>
+      <p class="hero-tag" id="hero-tag-text">100% Natural &amp; Organic</p>
+      <h1 class="hero-title" id="hero-title-el">Nature's Finest,<br><em id="hero-sub-el">Your Delight</em></h1>
+      <p class="hero-title-ar" id="hero-ar-el">أفضل ما في الطبيعة، بهجتك أنت</p>
+      <p class="hero-sub" id="hero-desc-el">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</p>
       <div style="display:flex;gap:.8rem;flex-wrap:wrap">
         <button class="btn btn-green" onclick="showPage('shop')">Shop Now <i class="ti ti-arrow-right"></i></button>
         <button class="btn btn-outline" onclick="showPage('about')">Our Story</button>
       </div>
     </div>
-    <div class="hero-right">
-      <svg viewBox="0 0 400 480" width="300" height="380">
-        <rect x="105" y="55" width="72" height="270" rx="30" fill="#7DB55A"/>
-        <rect x="115" y="105" width="52" height="75" rx="8" fill="rgba(255,255,255,.25)"/>
-        <text x="141" y="140" text-anchor="middle" font-size="8" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text>
-        <text x="141" y="154" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.75)" font-family="sans-serif">NATURAL OIL</text>
-        <rect x="215" y="95" width="82" height="224" rx="32" fill="#5A8A3A"/>
-        <rect x="226" y="142" width="60" height="72" rx="8" fill="rgba(255,255,255,.2)"/>
-        <text x="256" y="176" text-anchor="middle" font-size="8" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text>
-        <text x="256" y="190" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.75)" font-family="sans-serif">BODY BUTTER</text>
-        <rect x="152" y="194" width="54" height="154" rx="20" fill="#C4A882"/>
-        <text x="179" y="265" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,.75)" font-family="sans-serif">LIP CARE</text>
-      </svg>
-      <div class="hero-badge"><strong>100%</strong><span>Natural</span></div>
-    </div>
+    <div class="hero-badge"><strong>100%</strong><span>Natural</span></div>
   </div>
   <div class="features-bar">
     <div class="features-grid">
@@ -404,6 +395,57 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <a onclick="showPage('shop')" style="cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-decoration:none"><i class="ti ti-arrow-left"></i> Back to Shop</a>
   </div>
   <div class="pd-inner" id="product-detail-content"></div>
+
+<!-- REVIEWS SECTION -->
+<div id="reviews-section" style="padding:3rem 2.5rem;background:#fff;border-top:.5px solid rgba(30,42,24,.08)">
+  <div style="max-width:800px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+      <div>
+        <p style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:.5rem">Customer Reviews</p>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300">آراء العملاء</h3>
+      </div>
+      <button class="btn btn-outline-green btn-sm" onclick="toggleAddReview()"><i class="ti ti-plus"></i> Add Review</button>
+    </div>
+
+    <!-- Add Review Form -->
+    <div id="add-review-form" style="display:none;background:var(--green-light);padding:1.5rem;margin-bottom:2rem">
+      <h4 style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:1.2rem">Write a Review / اكتب رأيك</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div>
+          <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem;color:var(--muted)">Your Name</label>
+          <input type="text" id="review-name" placeholder="Sara Ahmed" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost';font-size:13px;outline:none"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem;color:var(--muted)">Rating / التقييم</label>
+          <div style="display:flex;gap:.3rem;margin-top:.3rem" id="star-rating">
+            <span onclick="setRating(1)" style="font-size:28px;cursor:pointer;color:var(--green)">★</span><span onclick="setRating(2)" style="font-size:28px;cursor:pointer;color:var(--green)">★</span><span onclick="setRating(3)" style="font-size:28px;cursor:pointer;color:var(--green)">★</span><span onclick="setRating(4)" style="font-size:28px;cursor:pointer;color:var(--green)">★</span><span onclick="setRating(5)" style="font-size:28px;cursor:pointer;color:var(--green)">★</span>
+          </div>
+          <input type="hidden" id="review-rating" value="5"/>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem;color:var(--muted)">Review Text / نص الرأي</label>
+        <textarea id="review-text" rows="3" placeholder="Share your experience with this product..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost';font-size:13px;outline:none;resize:vertical"></textarea>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.4rem;color:var(--muted)">Upload Review Photos (optional)</label>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;display:inline-flex">
+          <i class="ti ti-photo"></i> &nbsp;Upload Photos
+          <input type="file" accept="image/*" multiple style="display:none" onchange="handleReviewPhotos(this)"/>
+        </label>
+        <div id="review-photos-preview" style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem"></div>
+        <div id="review-photos-data" style="display:none"></div>
+      </div>
+      <div style="display:flex;gap:1rem">
+        <button class="btn btn-green btn-sm" onclick="submitReview()"><i class="ti ti-check"></i> Submit Review</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleAddReview()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div id="reviews-list"><div class="loading"><i class="ti ti-loader"></i>Loading reviews...</div></div>
+  </div>
+</div>
 </div>
 
 <!-- ════════════ CART ════════════ -->
@@ -695,6 +737,31 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <button class="btn btn-green" style="margin-top:1.5rem" onclick="saveSettings()"><i class="ti ti-check"></i> Save Settings</button>
         </div>
 
+        <div class="dash-card" style="margin-bottom:1.5rem">
+          <h3 class="dash-card-title" style="margin-bottom:1.5rem">SEO Settings / محركات البحث</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1.2rem">These help Google find your store / هذه تساعد جوجل في إيجاد متجرك</p>
+          <div style="margin-bottom:1.2rem">
+            <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Page Title / عنوان الصفحة</label>
+            <input type="text" id="seo-title" placeholder="Ayo Delight — Natural Products | منتجات طبيعية" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            <p style="font-size:11px;color:var(--muted);margin-top:.3rem">Max 60 characters recommended</p>
+          </div>
+          <div style="margin-bottom:1.2rem">
+            <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Meta Description / وصف الصفحة</label>
+            <textarea id="seo-desc" rows="3" placeholder="Ayo Delight offers 100% natural handcrafted beauty products — oils, body butters, and lip care. مستحضرات طبيعية خالصة..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical"></textarea>
+            <p style="font-size:11px;color:var(--muted);margin-top:.3rem">Max 160 characters recommended</p>
+          </div>
+          <div style="margin-bottom:1.2rem">
+            <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Keywords / الكلمات المفتاحية</label>
+            <input type="text" id="seo-keywords" placeholder="natural oils, body butter, زيوت طبيعية, مرطبات, مستحضرات طبيعية" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            <p style="font-size:11px;color:var(--muted);margin-top:.3rem">Separate with commas / افصل بفواصل</p>
+          </div>
+          <div style="margin-bottom:1.5rem">
+            <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Hashtags / هاشتاقات</label>
+            <input type="text" id="seo-tags" placeholder="#ayodelight #naturalskincare #زيوت_طبيعية #بشرة" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+          </div>
+          <button class="btn btn-green" onclick="saveSEO()"><i class="ti ti-check"></i> Save SEO Settings</button>
+        </div>
+
         <div class="dash-card">
           <h3 class="dash-card-title" style="margin-bottom:1.5rem">Change Password / تغيير كلمة السر</h3>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
@@ -904,6 +971,9 @@ function showProduct(p) {
       <div class="pd-tags"><span class="tag">100% Natural</span><span class="tag">Handcrafted</span><span class="tag">No Chemicals</span></div>
     </div>
   `;
+
+  // Load reviews for this product
+  setTimeout(() => loadProductReviews(p.id), 100);
   showPage('product');
 }
 function changeQty(d) { pdQty = Math.max(1, pdQty+d); const el = document.getElementById('pd-qty'); if(el) el.textContent = pdQty; }
@@ -1000,43 +1070,61 @@ function renderOrdersTable(orders, containerId) {
 
 function showOrderDetails(orderJson) {
   const o = JSON.parse(orderJson);
-  const items = Array.isArray(o.items) ? o.items : [];
-  const waNum = (o.customer_phone||'').replace(/[^0-9]/g,'');
+  let items = [];
+  try {
+    if(Array.isArray(o.items)) items = o.items;
+    else if(typeof o.items === 'string') items = JSON.parse(o.items);
+  } catch(e) { items = []; }
+  const waNum = (o.customer_phone||'').replace(/\D/g,'');
+  const waFixed = waNum.startsWith('0') ? '2'+waNum.slice(1) : waNum;
   const modal = document.getElementById('order-modal');
+  const itemsHtml = items.length ? items.map(i=>`
+    <div style="display:flex;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:.5px solid rgba(30,42,24,.08)">
+      ${i.image_url ? `<img src="${i.image_url}" style="width:50px;height:60px;object-fit:cover;background:var(--green-light)"/>` : `<div style="width:50px;height:60px;background:${i.color||'var(--green-light)'};opacity:.4;flex-shrink:0"></div>`}
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${i.name||''}</div>
+        <div style="font-size:12px;color:var(--muted);direction:rtl">${i.name_ar||''}</div>
+        <div style="font-size:12px;color:var(--muted)">EGP ${i.price||0} × ${i.qty||1}</div>
+      </div>
+      <div style="font-size:15px;font-family:'Cormorant Garamond',serif;font-weight:500">EGP ${(i.price||0)*(i.qty||1)}</div>
+    </div>`).join('') : '<p style="color:var(--muted);font-size:13px">No items data</p>';
+
   document.getElementById('order-modal-content').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
-      <div>
-        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Customer</p>
+    <div style="background:var(--green-light);padding:1.2rem;border-radius:2px;margin-bottom:1.5rem">
+      <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem">📦 Order Items / المنتجات المطلوبة</p>
+      ${itemsHtml}
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-family:'Cormorant Garamond',serif;margin-top:1rem;padding-top:1rem;border-top:.5px solid rgba(30,42,24,.15)">
+        <span>Total / الإجمالي</span><span style="color:var(--green-dark)">EGP ${o.total||0}</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+      <div style="padding:1rem;border:.5px solid rgba(30,42,24,.1)">
+        <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem">Customer</p>
         <p style="font-size:15px;font-weight:500">${o.customer_name||'-'}</p>
       </div>
-      <div>
-        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Phone</p>
-        <p style="font-size:15px"><a href="https://wa.me/${waNum}" target="_blank" style="color:var(--green)">${o.customer_phone||'-'} <i class="ti ti-brand-whatsapp"></i></a></p>
+      <div style="padding:1rem;border:.5px solid rgba(30,42,24,.1)">
+        <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem">Phone</p>
+        <p style="font-size:14px"><a href="https://wa.me/${waFixed}" target="_blank" style="color:var(--green);text-decoration:none">${o.customer_phone||'-'} <i class="ti ti-brand-whatsapp"></i></a></p>
       </div>
-      <div>
-        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Email</p>
-        <p style="font-size:14px">${o.customer_email||'-'}</p>
-      </div>
-      <div>
-        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Payment</p>
+      <div style="padding:1rem;border:.5px solid rgba(30,42,24,.1)">
+        <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem">Payment / الدفع</p>
         <p style="font-size:14px">${o.payment_method||'-'}</p>
       </div>
-      <div style="grid-column:1/-1">
-        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Address</p>
-        <p style="font-size:14px">${o.customer_address||'-'}, ${o.city||''}, ${o.country||''}</p>
+      <div style="padding:1rem;border:.5px solid rgba(30,42,24,.1)">
+        <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem">Email</p>
+        <p style="font-size:13px">${o.customer_email||'-'}</p>
+      </div>
+      <div style="grid-column:1/-1;padding:1rem;border:.5px solid rgba(30,42,24,.1)">
+        <p style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem">Address / العنوان</p>
+        <p style="font-size:13px">${o.customer_address||'-'}, ${o.city||''}, ${o.country||''}</p>
       </div>
     </div>
-    <div style="background:var(--green-light);padding:1.2rem;margin-bottom:1.5rem">
-      <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.8rem">Order Items / المنتجات</p>
-      ${items.map(i=>`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:.5px solid rgba(30,42,24,.1);font-size:13px"><span>${i.name||''} × ${i.qty||1}</span><span>EGP ${(i.price||0)*(i.qty||1)}</span></div>`).join('')}
-      <div style="display:flex;justify-content:space-between;font-size:16px;font-family:'Cormorant Garamond',serif;margin-top:.8rem;padding-top:.8rem;border-top:.5px solid rgba(30,42,24,.15)"><span>Total</span><span>EGP ${o.total||0}</span></div>
-    </div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
-      <a href="https://wa.me/${waNum}?text=Hello ${encodeURIComponent(o.customer_name||'')}! Your Ayo Delight order #${o.id} is confirmed. Total: EGP ${o.total}" target="_blank" class="btn btn-green btn-sm"><i class="ti ti-brand-whatsapp"></i> Message Customer</a>
-      <button class="btn btn-outline btn-sm" onclick="document.getElementById('order-modal').classList.remove('open')">Close</button>
+      <a href="https://wa.me/${waFixed}?text=${encodeURIComponent('مرحبا ' + (o.customer_name||'') + '! طلبك من Ayo Delight رقم #' + o.id + ' تم تأكيده. الإجمالي: EGP ' + o.total)}" target="_blank" class="btn btn-green btn-sm"><i class="ti ti-brand-whatsapp"></i> Send WhatsApp</a>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('order-modal').classList.remove('open')"><i class="ti ti-x"></i> Close</button>
     </div>
   `;
-  document.getElementById('order-modal-title').textContent = `Order #${o.id} — ${o.customer_name}`;
+  document.getElementById('order-modal-title').textContent = 'Order #' + o.id + ' — ' + (o.customer_name||'');
   modal.classList.add('open');
 }
 function showDashSection(name, el) {
@@ -1265,6 +1353,156 @@ function setLang(lang, btn) { document.querySelectorAll('.lang-btn').forEach(b=>
 function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
 function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
+// ═══ REVIEWS FUNCTIONS ═══
+let currentProductId = null;
+let reviewRating = 5;
+let reviewPhotos = [];
+
+function toggleAddReview() {
+  const form = document.getElementById('add-review-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  setRating(5);
+}
+
+function setRating(n) {
+  reviewRating = n;
+  document.getElementById('review-rating').value = n;
+  document.querySelectorAll('#star-rating span').forEach((s,i) => {
+    s.style.color = i < n ? 'var(--green)' : '#ddd';
+  });
+}
+
+function handleReviewPhotos(input) {
+  reviewPhotos = [];
+  const preview = document.getElementById('review-photos-preview');
+  preview.innerHTML = '';
+  const files = Array.from(input.files).slice(0, 4);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 600;
+        let w = img.width, h = img.height;
+        if(w > MAX){ h = h*(MAX/w); w = MAX; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        reviewPhotos.push(dataUrl);
+        preview.innerHTML += `<img src="${dataUrl}" style="width:70px;height:70px;object-fit:cover;border:.5px solid rgba(30,42,24,.15)"/>`;
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitReview() {
+  const name = document.getElementById('review-name').value.trim();
+  const text = document.getElementById('review-text').value.trim();
+  if(!name || !text){ showToast('Please fill name and review text'); return; }
+  const review = {
+    product_id: currentProductId,
+    reviewer_name: name,
+    rating: reviewRating,
+    review_text: text,
+    photos: reviewPhotos,
+    created_at: new Date().toISOString()
+  };
+  const {error} = await sb.from('reviews').insert([review]);
+  if(error) {
+    // Save locally if table doesn't exist yet
+    const key = 'reviews_' + currentProductId;
+    const existing = JSON.parse(localStorage.getItem(key)||'[]');
+    existing.unshift(review);
+    localStorage.setItem(key, JSON.stringify(existing.slice(0,20)));
+    showToast('Review saved locally! ✅');
+  } else {
+    showToast('Review submitted! شكراً لرأيك ✅');
+  }
+  document.getElementById('review-name').value = '';
+  document.getElementById('review-text').value = '';
+  reviewPhotos = [];
+  document.getElementById('review-photos-preview').innerHTML = '';
+  toggleAddReview();
+  loadProductReviews(currentProductId);
+}
+
+async function loadProductReviews(productId) {
+  currentProductId = productId;
+  const el = document.getElementById('reviews-list');
+  if(!el) return;
+  let reviews = [];
+  // Try Supabase first
+  try {
+    const {data} = await sb.from('reviews').select('*').eq('product_id', productId).order('created_at', {ascending:false});
+    if(data && data.length) reviews = data;
+  } catch(e) {}
+  // Fallback to localStorage
+  if(!reviews.length) {
+    reviews = JSON.parse(localStorage.getItem('reviews_'+productId)||'[]');
+  }
+  if(!reviews.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No reviews yet. Be the first! — لا توجد مراجعات بعد</p>';
+    return;
+  }
+  el.innerHTML = reviews.map(r => `
+    <div style="padding:1.5rem 0;border-bottom:.5px solid rgba(30,42,24,.08)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;flex-wrap:wrap;gap:.5rem">
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <div style="width:36px;height:36px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:500">${(r.reviewer_name||'?')[0].toUpperCase()}</div>
+          <span style="font-size:14px;font-weight:500">${r.reviewer_name||'Anonymous'}</span>
+        </div>
+        <div>
+          <span style="color:var(--green);font-size:16px">${'★'.repeat(r.rating||5)}${'☆'.repeat(5-(r.rating||5))}</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:.5rem">${new Date(r.created_at).toLocaleDateString()}</span>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--dark);line-height:1.8;margin-bottom:.8rem">${r.review_text||''}</p>
+      ${r.photos && r.photos.length ? `<div style="display:flex;gap:.5rem;flex-wrap:wrap">${r.photos.map(p=>`<img src="${p}" style="width:80px;height:80px;object-fit:cover;cursor:pointer" onclick="window.open('${p}','_blank')"/>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ═══ SEO FUNCTIONS ═══
+function saveSEO() {
+  const data = {
+    title: document.getElementById('seo-title').value,
+    desc: document.getElementById('seo-desc').value,
+    keywords: document.getElementById('seo-keywords').value,
+    tags: document.getElementById('seo-tags').value
+  };
+  localStorage.setItem('ayo_seo', JSON.stringify(data));
+  applySEO(data);
+  showToast('SEO saved! تم حفظ إعدادات السيو ✅');
+}
+
+function applySEO(d) {
+  if(!d) return;
+  if(d.title) document.title = d.title;
+  let metaDesc = document.querySelector('meta[name="description"]');
+  if(!metaDesc){ metaDesc = document.createElement('meta'); metaDesc.name='description'; document.head.appendChild(metaDesc); }
+  if(d.desc) metaDesc.content = d.desc;
+  let metaKw = document.querySelector('meta[name="keywords"]');
+  if(!metaKw){ metaKw = document.createElement('meta'); metaKw.name='keywords'; document.head.appendChild(metaKw); }
+  if(d.keywords) metaKw.content = d.keywords;
+}
+
+function loadSEOSettings() {
+  const seo = localStorage.getItem('ayo_seo');
+  if(seo) {
+    try {
+      const d = JSON.parse(seo);
+      applySEO(d);
+      if(document.getElementById('seo-title')) document.getElementById('seo-title').value = d.title||'';
+      if(document.getElementById('seo-desc')) document.getElementById('seo-desc').value = d.desc||'';
+      if(document.getElementById('seo-keywords')) document.getElementById('seo-keywords').value = d.keywords||'';
+      if(document.getElementById('seo-tags')) document.getElementById('seo-tags').value = d.tags||'';
+    } catch(e){}
+  }
+}
+
 // ═══ BANNER FUNCTIONS ═══
 function uploadBannerImage(input) {
   const file = input.files[0];
@@ -1303,13 +1541,11 @@ function saveBanner() {
 }
 
 function applyBannerImage(url) {
-  const heroRight = document.querySelector('.hero-right');
-  if(heroRight && url) {
-    heroRight.style.backgroundImage = `url(${url})`;
-    heroRight.style.backgroundSize = 'cover';
-    heroRight.style.backgroundPosition = 'center';
-    const svg = heroRight.querySelector('svg');
-    if(svg) svg.style.display = 'none';
+  const heroBg = document.getElementById('hero-bg');
+  if(heroBg && url) {
+    heroBg.style.backgroundImage = `url(${url})`;
+    heroBg.style.backgroundSize = 'cover';
+    heroBg.style.backgroundPosition = 'center';
   }
 }
 
@@ -1327,11 +1563,11 @@ function saveBannerText() {
 
 function applyBannerText(d) {
   if(!d) return;
-  const titleEl = document.querySelector('.hero-title');
-  if(titleEl && d.title_en) titleEl.innerHTML = d.title_en + '<br><em>' + d.sub_en + '</em>';
-  const arEl = document.querySelector('.hero-title-ar');
+  const titleEl = document.getElementById('hero-title-el');
+  if(titleEl && d.title_en) titleEl.innerHTML = d.title_en + '<br><em id="hero-sub-el">' + (d.sub_en||'') + '</em>';
+  const arEl = document.getElementById('hero-ar-el');
   if(arEl && d.title_ar) arEl.textContent = d.title_ar;
-  const descEl = document.querySelector('.hero-sub');
+  const descEl = document.getElementById('hero-desc-el');
   if(descEl && d.desc) descEl.textContent = d.desc;
 }
 
@@ -1362,6 +1598,7 @@ function loadBannerSettings() {
 // ═══ INIT ═══
 loadSavedSettings();
 loadBannerSettings();
+loadSEOSettings();
 initStore();
 </script>
 </body>
