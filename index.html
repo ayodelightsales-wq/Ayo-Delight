@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ayo Delight — Natural Products</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--green:#7DB55A;--green-dark:#5A8A3A;--green-light:#EEF5E8;--cream:#F8F5F0;--dark:#1E2A18;--gold:#C4A882;--muted:#7A8A72}
+html{scroll-behavior:smooth}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--dark)}
+.page{display:none}.page.active{display:block}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.12);background:var(--cream);position:sticky;top:0;z-index:200}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo-box{width:36px;height:36px;background:var(--green);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;letter-spacing:1px;line-height:1.1}
+.logo-text small{display:block;font-size:10px;font-weight:300;letter-spacing:3px;color:var(--muted);font-family:'Jost'}
+.nav-links{display:flex;gap:2rem;font-size:12px;letter-spacing:1.5px;text-transform:uppercase}
+.nav-links a{color:var(--dark);text-decoration:none;cursor:pointer;transition:color .2s;padding:4px 0;border-bottom:1px solid transparent}
+.nav-links a:hover,.nav-links a.active{color:var(--green);border-bottom-color:var(--green)}
+.nav-right{display:flex;gap:1rem;align-items:center}
+.nav-right i{font-size:19px;cursor:pointer;color:var(--dark);transition:color .2s}
+.nav-right i:hover{color:var(--green)}
+.cart-wrap{position:relative;cursor:pointer}
+.cart-count{position:absolute;top:-7px;right:-9px;background:var(--green);color:#fff;font-size:9px;width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lang-toggle{display:flex;border:.5px solid rgba(30,42,24,.2);border-radius:20px;overflow:hidden}
+.lang-btn{padding:4px 12px;font-size:11px;cursor:pointer;background:none;border:none;font-family:'Jost';color:var(--muted);transition:all .2s}
+.lang-btn.active{background:var(--dark);color:#fff}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:none;cursor:pointer;font-family:'Jost';transition:all .2s;text-decoration:none}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-dark)}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2e3e26}
+.btn-outline{background:none;color:var(--dark);border:.5px solid var(--dark)}.btn-outline:hover{background:var(--dark);color:#fff}
+.btn-outline-green{background:none;color:var(--green);border:.5px solid var(--green)}.btn-outline-green:hover{background:var(--green);color:#fff}
+.btn-sm{padding:8px 18px;font-size:10px}
+.btn-red{background:#e53e3e;color:#fff}.btn-red:hover{background:#c53030}
+
+/* HERO */
+.hero{display:grid;grid-template-columns:1fr 1fr;min-height:88vh;overflow:hidden}
+.hero-left{background:var(--green-light);display:flex;flex-direction:column;justify-content:center;padding:4rem 3.5rem}
+.hero-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green-dark);margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
+.hero-tag::before{content:'';width:24px;height:1px;background:var(--green)}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1.05;margin-bottom:.5rem}
+.hero-title em{font-style:italic;color:var(--green)}
+.hero-title-ar{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--muted);direction:rtl;margin-bottom:1.5rem}
+.hero-sub{font-size:13px;font-weight:300;color:var(--muted);line-height:1.9;max-width:380px;margin-bottom:2.5rem}
+.hero-right{background:#D4E8C2;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-badge{position:absolute;bottom:2.5rem;right:2rem;background:#fff;padding:14px 20px}
+.hero-badge strong{display:block;font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:400;color:var(--green-dark)}
+.hero-badge span{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+/* FEATURES */
+.features-bar{background:var(--dark);padding:2rem 2.5rem}
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center}
+.feat i{font-size:22px;color:var(--green);margin-bottom:.5rem}
+.feat-title{font-size:13px;color:#fff;margin-bottom:2px}
+.feat-ar{font-size:11px;color:rgba(255,255,255,.4);direction:rtl}
+
+/* SECTIONS */
+.section{padding:5rem 2.5rem}
+.section.bg-white{background:#fff}
+.sec-head{text-align:center;margin-bottom:3.5rem}
+.sec-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:.8rem}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300}
+.sec-title-ar{font-size:18px;color:var(--muted);direction:rtl;margin-top:4px;font-family:'Cormorant Garamond',serif;font-weight:300}
+
+/* PRODUCTS */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2rem}
+.pcard{cursor:pointer;transition:transform .2s}.pcard:hover{transform:translateY(-4px)}
+.pimg{width:100%;aspect-ratio:3/4;background:var(--green-light);position:relative;overflow:hidden;margin-bottom:1rem;display:flex;align-items:center;justify-content:center}
+.pimg img{width:100%;height:100%;object-fit:cover}
+.badge{position:absolute;top:1rem;left:1rem;color:#fff;font-size:9px;padding:4px 10px;letter-spacing:1.5px;text-transform:uppercase}
+.badge-new{background:var(--green-dark)}.badge-sale{background:var(--gold)}
+.overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(30,42,24,.88);padding:14px;transform:translateY(100%);transition:transform .3s ease}
+.pcard:hover .overlay{transform:translateY(0)}
+.add-btn{background:none;border:.5px solid #fff;color:#fff;padding:8px 20px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Jost';width:100%;transition:all .2s}
+.add-btn:hover{background:#fff;color:var(--dark)}
+.pname{font-size:13px;font-weight:400;margin-bottom:2px}
+.pname-ar{font-size:12px;color:var(--muted);direction:rtl;margin-bottom:6px}
+.pprice{font-family:'Cormorant Garamond',serif;font-size:18px}
+.pprice .old{text-decoration:line-through;color:var(--muted);font-size:14px;margin-right:6px}
+.stars{color:var(--green);font-size:11px;margin-bottom:4px}
+.loading{text-align:center;padding:4rem;color:var(--muted);font-size:13px}
+.loading i{font-size:32px;display:block;margin-bottom:1rem;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* SHOP FILTERS */
+.shop-header{background:var(--green-light);padding:3rem;text-align:center}
+.shop-filters{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;padding:2rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.1)}
+.filter-btn{padding:8px 20px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border:.5px solid rgba(30,42,24,.2);background:none;cursor:pointer;font-family:'Jost';transition:all .2s}
+.filter-btn:hover,.filter-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* PRODUCT DETAIL */
+.pd-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;padding:4rem 2.5rem;align-items:start}
+.pd-img{background:var(--green-light);aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pd-img img{width:100%;height:100%;object-fit:cover}
+.pd-title{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;margin-bottom:.4rem}
+.pd-title-ar{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--muted);direction:rtl;margin-bottom:1.2rem}
+.pd-price{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--green-dark);margin-bottom:1.5rem}
+.qty-wrap{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.qty-btn{width:36px;height:36px;border:.5px solid rgba(30,42,24,.2);background:none;cursor:pointer;font-size:18px;font-family:'Jost';transition:all .2s}
+.qty-btn:hover{background:var(--green);color:#fff;border-color:var(--green)}
+.qty-num{font-size:16px;font-weight:500;min-width:30px;text-align:center}
+.pd-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}
+.tag{padding:5px 12px;background:var(--green-light);font-size:11px;color:var(--green-dark);letter-spacing:1px}
+
+/* CART */
+.cart-inner{max-width:900px;margin:0 auto;padding:3rem}
+.cart-table{width:100%;border-collapse:collapse;margin-bottom:2rem}
+.cart-table th{font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:1rem;border-bottom:.5px solid rgba(30,42,24,.15);text-align:left;font-weight:400;color:var(--muted)}
+.cart-table td{padding:1.2rem 1rem;border-bottom:.5px solid rgba(30,42,24,.08);vertical-align:middle}
+.cart-summary{background:var(--green-light);padding:2rem;max-width:360px;margin-left:auto}
+.summary-row{display:flex;justify-content:space-between;margin-bottom:1rem;font-size:13px}
+.summary-total{display:flex;justify-content:space-between;padding-top:1rem;border-top:.5px solid rgba(30,42,24,.15);font-size:18px;font-family:'Cormorant Garamond',serif}
+
+/* CHECKOUT */
+.checkout-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:3rem;max-width:1000px;margin:0 auto;padding:3rem}
+.checkout-form h3{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:1.5rem}
+.form-group{margin-bottom:1.2rem}
+.form-group label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)}
+.form-group input,.form-group select{width:100%;padding:12px 16px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost';font-size:13px;outline:none;transition:border-color .2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--green)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.payment-option{display:flex;align-items:center;gap:.8rem;padding:12px 16px;border:.5px solid rgba(30,42,24,.15);cursor:pointer;transition:border-color .2s;margin-bottom:.8rem}
+.payment-option:hover,.payment-option.active{border-color:var(--green)}
+.payment-option input[type=radio]{accent-color:var(--green)}
+.order-summary{background:var(--green-light);padding:2rem;position:sticky;top:90px}
+.order-summary h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:1.5rem}
+.order-item{display:flex;justify-content:space-between;margin-bottom:.8rem;font-size:13px;padding-bottom:.8rem;border-bottom:.5px solid rgba(30,42,24,.1)}
+.order-total{display:flex;justify-content:space-between;font-size:18px;font-family:'Cormorant Garamond',serif;margin-top:1rem;padding-top:1rem;border-top:.5px solid rgba(30,42,24,.15)}
+
+/* SUCCESS */
+.success-page{text-align:center;padding:6rem 3rem}
+.success-icon{font-size:64px;color:var(--green);margin-bottom:2rem}
+
+/* NEWSLETTER */
+.nl{background:var(--green-light);padding:5rem 2.5rem;text-align:center}
+.nl-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;margin-bottom:.5rem}
+.nl-sub{font-size:13px;color:var(--muted);margin-bottom:2rem}
+.nl-form{display:flex;max-width:440px;margin:0 auto}
+.nl-input{flex:1;padding:14px 20px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost';font-size:13px;outline:none}
+.nl-btn{background:var(--green);color:#fff;border:none;padding:14px 24px;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Jost'}
+
+/* FOOTER */
+footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:2.5rem}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:1px;margin-bottom:8px}
+.footer-brand span{color:var(--green)}
+.footer-about{font-size:12px;color:rgba(255,255,255,.45);line-height:1.9;font-weight:300}
+.footer-heading{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:1rem;color:var(--green)}
+.footer-links{list-style:none}
+.footer-links li{margin-bottom:8px}
+.footer-links a{font-size:12px;color:rgba(255,255,255,.45);text-decoration:none;cursor:pointer;transition:color .2s}
+.footer-links a:hover{color:#fff}
+.footer-bottom{border-top:.5px solid rgba(255,255,255,.08);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.25)}
+.social-links{display:flex;gap:1rem}
+.social-links i{font-size:18px;color:rgba(255,255,255,.35);cursor:pointer;transition:color .2s}
+.social-links i:hover{color:var(--green)}
+
+/* ═══ DASHBOARD ═══ */
+.dash-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--dark)}
+.dash-login-box{background:#fff;padding:3rem;width:380px}
+.dash-login-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:.3rem}
+.dash-login-logo span{color:var(--green)}
+.dash-layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.dash-sidebar{background:var(--dark);padding:2rem 0;position:sticky;top:0;height:100vh}
+.dash-sidebar-logo{padding:0 1.5rem 2rem;font-family:'Cormorant Garamond',serif;font-size:20px;color:#fff;letter-spacing:1px;border-bottom:.5px solid rgba(255,255,255,.1);margin-bottom:1rem}
+.dash-sidebar-logo span{color:var(--green)}
+.dash-nav-item{display:flex;align-items:center;gap:.8rem;padding:.8rem 1.5rem;color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s;font-size:13px}
+.dash-nav-item:hover,.dash-nav-item.active{background:rgba(255,255,255,.08);color:#fff}
+.dash-nav-item i{font-size:18px;color:var(--green)}
+.dash-main{background:#f4f5f0;padding:2.5rem}
+.dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
+.dash-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300}
+.dash-section{display:none}.dash-section.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:2.5rem}
+.stat-card{background:#fff;padding:1.5rem;border-left:3px solid var(--green)}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--dark)}
+.stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.dash-card{background:#fff;padding:2rem;margin-bottom:1.5rem}
+.dash-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.dash-card-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300}
+.dash-table{width:100%;border-collapse:collapse}
+.dash-table th{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;padding:.8rem 1rem;border-bottom:.5px solid rgba(30,42,24,.1);text-align:left;font-weight:400;color:var(--muted)}
+.dash-table td{padding:.8rem 1rem;border-bottom:.5px solid rgba(30,42,24,.06);font-size:13px;vertical-align:middle}
+.dash-table tr:hover td{background:rgba(125,181,90,.04)}
+.status-badge{padding:4px 10px;font-size:10px;letter-spacing:1px;text-transform:uppercase;border-radius:2px}
+.status-new{background:#EEF5E8;color:var(--green-dark)}
+.status-processing{background:#FFF8E1;color:#B45309}
+.status-done{background:#E8F5E9;color:#2E7D32}
+.product-form{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.product-form .form-group{margin-bottom:0}
+.product-form .form-group.full{grid-column:1/-1}
+.product-form label{display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)}
+.product-form input,.product-form select,.product-form textarea{width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost';font-size:13px;outline:none;transition:border-color .2s}
+.product-form input:focus,.product-form select:focus,.product-form textarea:focus{border-color:var(--green)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;padding:2.5rem;width:700px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:1.5rem}
+.color-swatches{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.swatch.selected{border-color:var(--dark);transform:scale(1.15)}
+.img-preview{width:100%;height:160px;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin-top:.5rem;overflow:hidden}
+.img-preview img{width:100%;height:100%;object-fit:cover}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--dark);color:#fff;padding:14px 24px;font-size:13px;z-index:9999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast i{color:var(--green);margin-right:8px}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.2rem}.nav-links{display:none}
+  .hero{grid-template-columns:1fr}.hero-right{display:none}.hero-left{padding:3rem 1.5rem}.hero-title{font-size:38px}
+  .features-grid{grid-template-columns:repeat(2,1fr)}
+  .section{padding:3rem 1.2rem}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
+  .pd-inner,.checkout-inner{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .cart-inner{padding:1.5rem}
+  .dash-layout{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .product-form{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ NAV ════ -->
+<nav id="main-nav">
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="logo-box">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C12 2 9 6 9 10C9 12.2 10.3 14 12 14C13.7 14 15 12.2 15 10C15 6 12 2 12 2Z" fill="white" opacity=".9"/>
+        <path d="M12 2C12 2 7 7 6 11C5.5 13.5 7 15.5 9 15" fill="white" opacity=".6"/>
+        <path d="M12 2C12 2 17 7 18 11C18.5 13.5 17 15.5 15 15" fill="white" opacity=".6"/>
+        <line x1="12" y1="14" x2="12" y2="22" stroke="white" stroke-width="1.5" opacity=".7"/>
+      </svg>
+    </div>
+    <div class="logo-text">Ayo Delight<small>Natural Products</small></div>
+  </div>
+  <div class="nav-links">
+    <a onclick="showPage('home')" id="nav-home" class="active">Home</a>
+    <a onclick="showPage('shop')" id="nav-shop">Shop</a>
+    <a onclick="showPage('about')" id="nav-about">About</a>
+    <a onclick="showDashLogin()" style="color:var(--muted)"><i class="ti ti-lock" style="font-size:14px;vertical-align:middle"></i> Admin</a>
+  </div>
+  <div class="nav-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+      <button class="lang-btn" onclick="setLang('ar',this)">AR</button>
+    </div>
+    <i class="ti ti-search"></i>
+    <i class="ti ti-heart"></i>
+    <div class="cart-wrap" onclick="showPage('cart')">
+      <i class="ti ti-shopping-bag"></i>
+      <span class="cart-count" id="cart-count">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════ HOME ════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-tag">100% Natural &amp; Organic</p>
+      <h1 class="hero-title">Nature's Finest,<br><em>Your Delight</em></h1>
+      <p class="hero-title-ar">أفضل ما في الطبيعة، بهجتك أنت</p>
+      <p class="hero-sub">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</p>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="showPage('shop')">Shop Now <i class="ti ti-arrow-right"></i></button>
+        <button class="btn btn-outline" onclick="showPage('about')">Our Story</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <svg viewBox="0 0 400 480" width="300" height="380">
+        <rect x="105" y="55" width="72" height="270" rx="30" fill="#7DB55A"/>
+        <rect x="115" y="105" width="52" height="75" rx="8" fill="rgba(255,255,255,.25)"/>
+        <text x="141" y="140" text-anchor="middle" font-size="8" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text>
+        <text x="141" y="154" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.75)" font-family="sans-serif">NATURAL OIL</text>
+        <rect x="215" y="95" width="82" height="224" rx="32" fill="#5A8A3A"/>
+        <rect x="226" y="142" width="60" height="72" rx="8" fill="rgba(255,255,255,.2)"/>
+        <text x="256" y="176" text-anchor="middle" font-size="8" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text>
+        <text x="256" y="190" text-anchor="middle" font-size="7" fill="rgba(255,255,255,.75)" font-family="sans-serif">BODY BUTTER</text>
+        <rect x="152" y="194" width="54" height="154" rx="20" fill="#C4A882"/>
+        <text x="179" y="265" text-anchor="middle" font-size="6.5" fill="rgba(255,255,255,.75)" font-family="sans-serif">LIP CARE</text>
+      </svg>
+      <div class="hero-badge"><strong>100%</strong><span>Natural</span></div>
+    </div>
+  </div>
+  <div class="features-bar">
+    <div class="features-grid">
+      <div class="feat"><i class="ti ti-leaf"></i><div class="feat-title">100% Natural</div><div class="feat-ar">طبيعي خالص</div></div>
+      <div class="feat"><i class="ti ti-flask"></i><div class="feat-title">Handcrafted</div><div class="feat-ar">مصنوع يدوياً</div></div>
+      <div class="feat"><i class="ti ti-truck"></i><div class="feat-title">Fast Delivery</div><div class="feat-ar">توصيل سريع</div></div>
+      <div class="feat"><i class="ti ti-shield-check"></i><div class="feat-title">Certified Safe</div><div class="feat-ar">آمن ومعتمد</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-head">
+      <p class="sec-tag">Featured Collection</p>
+      <h2 class="sec-title">Our Best Sellers</h2>
+      <p class="sec-title-ar">الأكثر مبيعاً</p>
+    </div>
+    <div class="products-grid" id="home-products">
+      <div class="loading"><i class="ti ti-loader"></i>Loading products...</div>
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <button class="btn btn-outline-green" onclick="showPage('shop')">View All — عرض الكل <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+  <div class="nl">
+    <p class="sec-tag">Stay Connected</p>
+    <h2 class="nl-title">Join Our Family</h2>
+    <p class="nl-sub">Get exclusive offers &amp; new arrivals — انضمي لعائلة Ayo Delight</p>
+    <div class="nl-form">
+      <input class="nl-input" type="email" placeholder="Your email / بريدك الإلكتروني"/>
+      <button class="nl-btn">Subscribe</button>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Ayo <span>Delight</span></div>
+        <p style="font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Natural Products</p>
+        <p class="footer-about">Pure natural beauty products handcrafted with love. منتجات جمال طبيعية مصنوعة بعناية.</p>
+      </div>
+      <div><p class="footer-heading">Shop</p><ul class="footer-links"><li><a onclick="showPage('shop')">All Products</a></li><li><a onclick="showPage('shop')">Natural Oils</a></li><li><a onclick="showPage('shop')">Body Butters</a></li><li><a onclick="showPage('shop')">Lip Care</a></li></ul></div>
+      <div><p class="footer-heading">Help</p><ul class="footer-links"><li><a>Shipping</a></li><li><a>Returns</a></li><li><a onclick="showPage('cart')">Track Order</a></li><li><a>FAQ</a></li></ul></div>
+      <div><p class="footer-heading">Contact</p><ul class="footer-links"><li><a href="https://wa.me/966500000000" target="_blank">WhatsApp</a></li><li><a href="https://instagram.com/ayodelight" target="_blank">Instagram</a></li><li><a href="mailto:hello@ayodelight.com">Email Us</a></li><li><a onclick="showPage('about')">About Us</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p class="footer-copy">© 2026 Ayo Delight Natural Products.</p><div class="social-links"><i class="ti ti-brand-instagram"></i><i class="ti ti-brand-tiktok"></i><i class="ti ti-brand-whatsapp"></i></div></div>
+  </footer>
+</div>
+
+<!-- ════════════ SHOP ════════════ -->
+<div id="page-shop" class="page">
+  <div class="shop-header">
+    <p class="sec-tag">Ayo Delight Collection</p>
+    <h2 class="sec-title">All Products</h2>
+    <p class="sec-title-ar">جميع المنتجات الطبيعية</p>
+  </div>
+  <div class="shop-filters">
+    <button class="filter-btn active" onclick="filterProducts('all',this)">All / الكل</button>
+    <button class="filter-btn" onclick="filterProducts('oils',this)">Oils / الزيوت</button>
+    <button class="filter-btn" onclick="filterProducts('butter',this)">Body Butters / المخمرية</button>
+    <button class="filter-btn" onclick="filterProducts('lip',this)">Lip Care / الشفاة</button>
+    <button class="filter-btn" onclick="filterProducts('hair',this)">Hair / الشعر</button>
+  </div>
+  <div class="section">
+    <div class="products-grid" id="shop-products">
+      <div class="loading"><i class="ti ti-loader"></i>Loading products...</div>
+    </div>
+  </div>
+  <footer><div class="footer-bottom" style="padding:1.5rem 2.5rem"><p class="footer-copy">© 2026 Ayo Delight</p></div></footer>
+</div>
+
+<!-- ════════════ PRODUCT DETAIL ════════════ -->
+<div id="page-product" class="page">
+  <div style="padding:1.5rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.1)">
+    <a onclick="showPage('shop')" style="cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-decoration:none"><i class="ti ti-arrow-left"></i> Back to Shop</a>
+  </div>
+  <div class="pd-inner" id="product-detail-content"></div>
+</div>
+
+<!-- ════════════ CART ════════════ -->
+<div id="page-cart" class="page">
+  <div class="section">
+    <div class="sec-head"><p class="sec-tag">Your Cart</p><h2 class="sec-title">Shopping Cart</h2></div>
+    <div class="cart-inner">
+      <div id="cart-items-container"></div>
+      <div id="cart-summary-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ CHECKOUT ════════════ -->
+<div id="page-checkout" class="page">
+  <div class="section">
+    <div class="sec-head"><p class="sec-tag">Secure Checkout</p><h2 class="sec-title">Complete Your Order</h2></div>
+    <div class="checkout-inner">
+      <div class="checkout-form">
+        <h3>Shipping Information / بيانات الشحن</h3>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="co-fname" placeholder="Sara"/></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="co-lname" placeholder="Al-Rashid"/></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="co-email" placeholder="sara@email.com"/></div>
+        <div class="form-group"><label>Phone (WhatsApp)</label><input type="tel" id="co-phone" placeholder="+966 5X XXX XXXX"/></div>
+        <div class="form-group"><label>Address</label><input type="text" id="co-address" placeholder="Street, Building, Apartment"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><select id="co-city"><option>Riyadh</option><option>Jeddah</option><option>Dammam</option><option>Cairo / القاهرة</option><option>Dubai</option><option>Other</option></select></div>
+          <div class="form-group"><label>Country</label><select id="co-country"><option>Saudi Arabia</option><option>Egypt</option><option>UAE</option><option>Kuwait</option><option>Qatar</option><option>Bahrain</option></select></div>
+        </div>
+        <h3 style="margin:2rem 0 1.2rem">Payment Method / طريقة الدفع</h3>
+        <label class="payment-option active" onclick="selectPayment(this)"><input type="radio" name="payment" value="bank" checked/><i class="ti ti-building-bank" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Bank Transfer / تحويل بنكي</div><div style="font-size:11px;color:var(--muted)">Al Rajhi / Alinma</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="whatsapp"/><i class="ti ti-brand-whatsapp" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">WhatsApp Order</div><div style="font-size:11px;color:var(--muted)">Confirm via WhatsApp</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="card"/><i class="ti ti-credit-card" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Credit / Debit Card</div><div style="font-size:11px;color:var(--muted)">Visa / Mastercard / Mada</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="cod"/><i class="ti ti-cash" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Cash on Delivery</div><div style="font-size:11px;color:var(--muted)">Pay when you receive</div></div></label>
+        <button class="btn btn-green" style="width:100%;justify-content:center;padding:16px;margin-top:1.5rem" onclick="placeOrder()">Place Order — تأكيد الطلب <i class="ti ti-check"></i></button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:1rem"><i class="ti ti-lock" style="vertical-align:middle"></i> Secure &amp; Encrypted</p>
+      </div>
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div id="checkout-items"></div>
+        <div class="order-total"><span>Total</span><span id="checkout-total">SAR 0</span></div>
+        <div style="margin-top:1rem;padding:.8rem;background:rgba(125,181,90,.12);font-size:12px;color:var(--green-dark);text-align:center"><i class="ti ti-truck"></i> Free shipping over SAR 150</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ SUCCESS ════════════ -->
+<div id="page-success" class="page">
+  <div class="success-page">
+    <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;margin-bottom:1rem">Order Confirmed! 🌿</h2>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--muted);margin-bottom:1rem">تم تأكيد طلبك بنجاح!</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:2rem;line-height:1.9">Thank you for choosing Ayo Delight.<br>سنتواصل معك على واتساب لتأكيد الطلب.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-green" onclick="showPage('home')">Continue Shopping</button>
+      <a href="https://wa.me/966500000000" class="btn btn-outline" target="_blank">Contact Us</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ABOUT ════════════ -->
+<div id="page-about" class="page">
+  <div class="shop-header"><p class="sec-tag">Our Story</p><h2 class="sec-title">Ayo Delight Natural Products</h2></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:4rem 2.5rem">
+    <div style="background:var(--green-light);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center">
+      <svg viewBox="0 0 240 180" width="220"><circle cx="120" cy="90" r="70" fill="#D4E8C2"/><g fill="#7DB55A" opacity=".6"><ellipse cx="120" cy="48" rx="10" ry="24"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(30 120 48)"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(-30 120 48)"/></g><text x="120" y="125" text-anchor="middle" font-size="14" fill="#5A8A3A" font-family="serif" font-weight="600">Ayo Delight</text><text x="120" y="142" text-anchor="middle" font-size="10" fill="#7A8A72" font-family="sans-serif">Natural Products</text></svg>
+    </div>
+    <div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;margin-bottom:1rem">Why Ayo Delight?</h3>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1.2rem">We believe beauty should never come at the cost of your health. Every Ayo Delight product is crafted from carefully selected natural ingredients — no harmful chemicals, no shortcuts.</p>
+      <p style="font-size:13px;color:var(--muted);direction:rtl;line-height:1.9">نؤمن أن الجمال لا يجب أن يأتي على حساب صحتك. كل منتج في Ayo Delight مصنوع من مكونات طبيعية مختارة بعناية.</p>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;padding:4rem 2.5rem;background:#fff">
+    <div style="text-align:center;padding:2rem"><i class="ti ti-leaf" style="font-size:32px;color:var(--green);margin-bottom:1rem"></i><h4 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:.5rem">100% Natural</h4><p style="font-size:12px;color:var(--muted);line-height:1.8">No harmful chemicals, only pure botanical ingredients.</p></div>
+    <div style="text-align:center;padding:2rem"><i class="ti ti-heart" style="font-size:32px;color:var(--green);margin-bottom:1rem"></i><h4 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:.5rem">Made with Love</h4><p style="font-size:12px;color:var(--muted);line-height:1.8">Handcrafted in small batches for highest quality.</p></div>
+    <div style="text-align:center;padding:2rem"><i class="ti ti-world" style="font-size:32px;color:var(--green);margin-bottom:1rem"></i><h4 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;margin-bottom:.5rem">Eco Friendly</h4><p style="font-size:12px;color:var(--muted);line-height:1.8">Sustainable packaging and ethical sourcing.</p></div>
+  </div>
+  <footer><div class="footer-bottom" style="padding:1.5rem 2.5rem"><p class="footer-copy">© 2026 Ayo Delight Natural Products.</p></div></footer>
+</div>
+
+<!-- ════════════ DASHBOARD LOGIN ════════════ -->
+<div id="page-dash-login" class="page">
+  <div class="dash-login">
+    <div class="dash-login-box">
+      <div class="dash-login-logo">Ayo <span>Delight</span></div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:2rem;letter-spacing:1px;text-transform:uppercase">Admin Dashboard</p>
+      <div class="form-group" style="margin-bottom:1.2rem">
+        <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Password</label>
+        <input type="password" id="dash-password" placeholder="Enter admin password" style="width:100%;padding:12px 16px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none" onkeypress="if(event.key==='Enter')dashLogin()"/>
+      </div>
+      <button class="btn btn-green" style="width:100%;justify-content:center" onclick="dashLogin()">Login — دخول</button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:1.5rem;cursor:pointer" onclick="showPage('home')">← Back to Store</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ DASHBOARD ════════════ -->
+<div id="page-dashboard" class="page">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-sidebar-logo">Ayo <span>Delight</span><div style="font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-top:4px">Admin Panel</div></div>
+      <div class="dash-nav-item active" onclick="showDashSection('overview',this)"><i class="ti ti-home"></i> Overview</div>
+      <div class="dash-nav-item" onclick="showDashSection('products',this)"><i class="ti ti-package"></i> Products / المنتجات</div>
+      <div class="dash-nav-item" onclick="showDashSection('orders',this)"><i class="ti ti-shopping-cart"></i> Orders / الطلبات</div>
+      <div style="position:absolute;bottom:2rem;width:100%">
+        <div class="dash-nav-item" onclick="showPage('home')"><i class="ti ti-external-link"></i> View Store</div>
+        <div class="dash-nav-item" onclick="showPage('home')" style="color:rgba(255,100,100,.6)"><i class="ti ti-logout" style="color:rgba(255,100,100,.6)"></i> Logout</div>
+      </div>
+    </div>
+    <div class="dash-main">
+
+      <!-- OVERVIEW -->
+      <div id="dash-overview" class="dash-section active">
+        <div class="dash-header"><h2 class="dash-title">Dashboard Overview</h2></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-num" id="stat-products">0</div><div class="stat-label">Total Products</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-orders">0</div><div class="stat-label">Total Orders</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-revenue">0</div><div class="stat-label">Total Revenue (SAR)</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-new-orders">0</div><div class="stat-label">New Orders</div></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header"><h3 class="dash-card-title">Recent Orders</h3></div>
+          <div id="recent-orders-table"><div class="loading"><i class="ti ti-loader"></i>Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="dash-products" class="dash-section">
+        <div class="dash-header">
+          <h2 class="dash-title">Products / المنتجات</h2>
+          <button class="btn btn-green btn-sm" onclick="openProductModal()"><i class="ti ti-plus"></i> Add Product</button>
+        </div>
+        <div class="dash-card">
+          <div id="products-table"><div class="loading"><i class="ti ti-loader"></i>Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="dash-orders" class="dash-section">
+        <div class="dash-header"><h2 class="dash-title">Orders / الطلبات</h2></div>
+        <div class="dash-card">
+          <div id="orders-table"><div class="loading"><i class="ti ti-loader"></i>Loading...</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRODUCT MODAL ════ -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <h3 class="modal-title" id="modal-title">Add New Product</h3>
+    <input type="hidden" id="edit-product-id"/>
+    <div class="product-form">
+      <div class="form-group"><label>Product Name (English)</label><input type="text" id="p-name" placeholder="e.g. Argan Oil"/></div>
+      <div class="form-group"><label>اسم المنتج (عربي)</label><input type="text" id="p-name-ar" placeholder="مثال: زيت الأرغان"/></div>
+      <div class="form-group"><label>Price (SAR)</label><input type="number" id="p-price" placeholder="89"/></div>
+      <div class="form-group"><label>Old Price (optional)</label><input type="number" id="p-old-price" placeholder="120"/></div>
+      <div class="form-group"><label>Category</label>
+        <select id="p-category">
+          <option value="oils">Oils / الزيوت</option>
+          <option value="butter">Body Butters / المخمرية</option>
+          <option value="lip">Lip Care / الشفاة</option>
+          <option value="hair">Hair / الشعر</option>
+          <option value="general">General / عام</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Badge</label>
+        <select id="p-badge">
+          <option value="">None</option>
+          <option value="new">New</option>
+          <option value="sale">Sale</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Description (English)</label><textarea id="p-desc" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical" placeholder="Product description..."></textarea></div>
+      <div class="form-group full"><label>الوصف (عربي)</label><textarea id="p-desc-ar" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical;direction:rtl" placeholder="وصف المنتج..."></textarea></div>
+      <div class="form-group full"><label>Image URL (رابط الصورة)</label><input type="url" id="p-image" placeholder="https://..." oninput="previewImage(this.value)"/>
+        <div class="img-preview" id="img-preview"><i class="ti ti-photo" style="font-size:32px;color:var(--muted)"></i></div>
+      </div>
+      <div class="form-group full"><label>Card Color</label>
+        <div class="color-swatches">
+          <div class="swatch selected" style="background:#7DB55A" onclick="selectColor('#7DB55A',this)"></div>
+          <div class="swatch" style="background:#5A8A3A" onclick="selectColor('#5A8A3A',this)"></div>
+          <div class="swatch" style="background:#C4A882" onclick="selectColor('#C4A882',this)"></div>
+          <div class="swatch" style="background:#8B9E7E" onclick="selectColor('#8B9E7E',this)"></div>
+          <div class="swatch" style="background:#2A2520" onclick="selectColor('#2A2520',this)"></div>
+          <div class="swatch" style="background:#D4A574" onclick="selectColor('#D4A574',this)"></div>
+          <div class="swatch" style="background:#8B6A3A" onclick="selectColor('#8B6A3A',this)"></div>
+          <div class="swatch" style="background:#E8A830" onclick="selectColor('#E8A830',this)"></div>
+        </div>
+        <input type="hidden" id="p-color" value="#7DB55A"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem;margin-top:2rem;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-green" onclick="saveProduct()"><i class="ti ti-check"></i> Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
+
+<script>
+const SUPABASE_URL = 'https://gtlcmokuslhsxljonxvg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0bGNtb2t1c2xoc3hsam9ueHZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1ODI3ODQsImV4cCI6MjA5NTE1ODc4NH0.TrRMSoqjyr3WhyiizPF4meNvv1aUssnJVxo_kraiQjc';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const ADMIN_PASSWORD = 'ayodelight2026';
+
+let cart = [];
+let allProducts = [];
+let currentProduct = null;
+let pdQty = 1;
+let selectedColor = '#7DB55A';
+
+// ═══ SUPABASE FUNCTIONS ═══
+async function loadProducts() {
+  const {data, error} = await sb.from('products').select('*').eq('in_stock', true).order('created_at', {ascending: false});
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+async function loadOrders() {
+  const {data, error} = await sb.from('orders').select('*').order('created_at', {ascending: false});
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+async function saveProductDB(product) {
+  if (product.id) {
+    const {id, ...rest} = product;
+    return await sb.from('products').update(rest).eq('id', id);
+  }
+  return await sb.from('products').insert([product]);
+}
+async function deleteProductDB(id) {
+  return await sb.from('products').delete().eq('id', id);
+}
+async function saveOrderDB(order) {
+  return await sb.from('orders').insert([order]);
+}
+async function updateOrderStatus(id, status) {
+  return await sb.from('orders').update({status}).eq('id', id);
+}
+
+// ═══ RENDER PRODUCT CARD ═══
+function renderCard(p, container) {
+  const card = document.createElement('div');
+  card.className = 'pcard';
+  const imgContent = p.image_url
+    ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy"/>`
+    : `<svg viewBox="0 0 100 160" width="70"><rect x="18" y="10" width="64" height="132" rx="24" fill="${p.color||'#7DB55A'}" opacity=".85"/><rect x="27" y="48" width="46" height="55" rx="8" fill="rgba(255,255,255,.22)"/><text x="50" y="75" text-anchor="middle" font-size="7" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text><text x="50" y="90" text-anchor="middle" font-size="5.5" fill="rgba(255,255,255,.75)" font-family="sans-serif">${(p.name||'').toUpperCase().substring(0,14)}</text></svg>`;
+  card.innerHTML = `
+    <div class="pimg" style="background:${(p.color||'#7DB55A')}18">
+      ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge==='new'?'New':'Sale'}</span>` : ''}
+      ${imgContent}
+      <div class="overlay"><button class="add-btn" onclick="event.stopPropagation();addToCart({id:${p.id},name:'${(p.name||'').replace(/'/g,"\\'")}',nameAr:'${(p.name_ar||'').replace(/'/g,"\\'")}',price:${p.price},color:'${p.color||'#7DB55A'}',image_url:'${p.image_url||''}'})">Add to Cart — أضف للسلة</button></div>
+    </div>
+    <div class="stars">★★★★★</div>
+    <div class="pname">${p.name||''}</div>
+    <div class="pname-ar">${p.name_ar||''}</div>
+    <div class="pprice">${p.old_price?`<span class="old">SAR ${p.old_price}</span>`:''}SAR ${p.price}</div>
+  `;
+  card.addEventListener('click', () => showProduct(p));
+  container.appendChild(card);
+}
+
+// ═══ INIT HOME & SHOP ═══
+async function initStore() {
+  allProducts = await loadProducts();
+  const homeGrid = document.getElementById('home-products');
+  const shopGrid = document.getElementById('shop-products');
+  homeGrid.innerHTML = '';
+  shopGrid.innerHTML = '';
+  if (!allProducts.length) {
+    homeGrid.innerHTML = '<p style="color:var(--muted);font-size:13px;grid-column:1/-1;text-align:center;padding:2rem">No products yet. Add products from the admin dashboard!</p>';
+    shopGrid.innerHTML = '<p style="color:var(--muted);font-size:13px;grid-column:1/-1;text-align:center;padding:2rem">No products yet.</p>';
+    return;
+  }
+  allProducts.slice(0,4).forEach(p => renderCard(p, homeGrid));
+  allProducts.forEach(p => renderCard(p, shopGrid));
+}
+
+function filterProducts(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const grid = document.getElementById('shop-products');
+  grid.innerHTML = '';
+  const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+  if (!filtered.length) { grid.innerHTML = '<p style="color:var(--muted);font-size:13px;grid-column:1/-1;text-align:center;padding:2rem">No products in this category yet.</p>'; return; }
+  filtered.forEach(p => renderCard(p, grid));
+}
+
+// ═══ PRODUCT DETAIL ═══
+function showProduct(p) {
+  currentProduct = p; pdQty = 1;
+  const container = document.getElementById('product-detail-content');
+  const imgContent = p.image_url
+    ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover"/>`
+    : `<svg viewBox="0 0 200 280" width="160"><rect x="30" y="15" width="140" height="250" rx="40" fill="${p.color||'#7DB55A'}" opacity=".85"/><rect x="48" y="75" width="104" height="100" rx="12" fill="rgba(255,255,255,.22)"/><text x="100" y="120" text-anchor="middle" font-size="12" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text><text x="100" y="138" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.7)" font-family="sans-serif">${(p.name||'').toUpperCase().substring(0,14)}</text></svg>`;
+  container.innerHTML = `
+    <div class="pd-img" style="background:${(p.color||'#7DB55A')}18">${imgContent}</div>
+    <div>
+      <p class="sec-tag" style="text-align:left">${(p.category||'').toUpperCase()}</p>
+      <h2 class="pd-title">${p.name||''}</h2>
+      <p class="pd-title-ar">${p.name_ar||''}</p>
+      <div class="stars" style="font-size:16px;margin-bottom:1rem">★★★★★</div>
+      <div class="pd-price">${p.old_price?`<span style="text-decoration:line-through;color:var(--muted);font-size:22px;margin-right:12px">SAR ${p.old_price}</span>`:''}SAR ${p.price}</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;font-weight:300">${p.description||''}</p>
+      <p style="font-size:13px;color:var(--muted);direction:rtl;line-height:1.9;margin-bottom:1.5rem;font-weight:300">${p.description_ar||''}</p>
+      <div class="qty-wrap">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span class="qty-num" id="pd-qty">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+        <span style="font-size:12px;color:var(--muted)">Quantity / الكمية</span>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="addToCartFromDetail()">Add to Cart — أضف للسلة <i class="ti ti-shopping-cart"></i></button>
+        <button class="btn btn-outline" onclick="showPage('shop')">Back — رجوع</button>
+      </div>
+      <div class="pd-tags"><span class="tag">100% Natural</span><span class="tag">Handcrafted</span><span class="tag">No Chemicals</span></div>
+    </div>
+  `;
+  showPage('product');
+}
+function changeQty(d) { pdQty = Math.max(1, pdQty+d); const el = document.getElementById('pd-qty'); if(el) el.textContent = pdQty; }
+function addToCartFromDetail() { for(let i=0;i<pdQty;i++) addToCart(currentProduct,true); pdQty=1; const el=document.getElementById('pd-qty'); if(el) el.textContent=1; showToast(`Added: ${currentProduct.name}`); }
+
+// ═══ CART ═══
+function addToCart(p, silent) {
+  const ex = cart.find(i => i.id === p.id);
+  if(ex) ex.qty++; else cart.push({...p, qty:1});
+  updateCartUI();
+  if(!silent) showToast(`Added: ${p.name} — تمت الإضافة`);
+}
+function removeFromCart(id) { cart = cart.filter(i => i.id !== id); updateCartUI(); renderCartPage(); }
+function updateQtyCart(id, d) { const item = cart.find(i => i.id === id); if(item){item.qty+=d; if(item.qty<=0) cart=cart.filter(i=>i.id!==id);} updateCartUI(); renderCartPage(); }
+function updateCartUI() { document.getElementById('cart-count').textContent = cart.reduce((s,i)=>s+i.qty,0); }
+function renderCartPage() {
+  const container = document.getElementById('cart-items-container');
+  const summary = document.getElementById('cart-summary-container');
+  if(!cart.length){ container.innerHTML='<div style="text-align:center;padding:4rem;color:var(--muted)"><i class="ti ti-shopping-bag" style="font-size:48px;opacity:.3"></i><p style="margin-top:1rem;font-size:14px">Your cart is empty / سلتك فارغة</p></div>'; summary.innerHTML=''; return; }
+  let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  container.innerHTML = `<table class="cart-table"><thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody>${cart.map(i=>`<tr><td><div style="display:flex;align-items:center;gap:1rem">${i.image_url?`<img src="${i.image_url}" style="width:60px;height:70px;object-fit:cover;background:var(--green-light)">`:`<div style="width:60px;height:70px;background:${i.color||'var(--green-light)'};opacity:.3"></div>`}<div><div style="font-size:13px">${i.name}</div><div style="font-size:11px;color:var(--muted);direction:rtl">${i.name_ar||''}</div></div></div></td><td>SAR ${i.price}</td><td><div style="display:flex;align-items:center;gap:.5rem"><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},-1)">−</button><span style="min-width:20px;text-align:center">${i.qty}</span><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},1)">+</button></div></td><td>SAR ${i.price*i.qty}</td><td><i class="ti ti-trash" style="cursor:pointer;color:var(--muted)" onclick="removeFromCart(${i.id})"></i></td></tr>`).join('')}</tbody></table>`;
+  const shipping = total >= 150 ? 0 : 25;
+  summary.innerHTML = `<div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>SAR ${total}</span></div><div class="summary-row"><span>Shipping</span><span>${shipping===0?'<span style="color:var(--green)">Free</span>':'SAR '+shipping}</span></div><div class="summary-total"><span>Total</span><span>SAR ${total+shipping}</span></div><button class="btn btn-green" style="width:100%;justify-content:center;margin-top:1.5rem" onclick="goCheckout()">Checkout — إتمام الشراء <i class="ti ti-arrow-right"></i></button><button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.8rem" onclick="showPage('shop')">Continue Shopping</button></div>`;
+}
+function goCheckout() {
+  let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  let shipping = total>=150?0:25;
+  document.getElementById('checkout-items').innerHTML = cart.map(i=>`<div class="order-item"><span>${i.name} × ${i.qty}</span><span>SAR ${i.price*i.qty}</span></div>`).join('') + `<div class="order-item"><span>Shipping</span><span>${shipping===0?'Free':'SAR '+shipping}</span></div>`;
+  document.getElementById('checkout-total').textContent = `SAR ${total+shipping}`;
+  showPage('checkout');
+}
+async function placeOrder() {
+  const name = (document.getElementById('co-fname').value+' '+document.getElementById('co-lname').value).trim();
+  if(!name){ showToast('Please enter your name'); return; }
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0) + (cart.reduce((s,i)=>s+i.price*i.qty,0)>=150?0:25);
+  const payment = document.querySelector('input[name="payment"]:checked')?.value || 'bank';
+  await saveOrderDB({
+    customer_name: name,
+    customer_email: document.getElementById('co-email').value,
+    customer_phone: document.getElementById('co-phone').value,
+    customer_address: document.getElementById('co-address').value,
+    city: document.getElementById('co-city').value,
+    country: document.getElementById('co-country').value,
+    payment_method: payment,
+    items: cart,
+    total: total,
+    status: 'new'
+  });
+  cart=[]; updateCartUI(); showPage('success');
+}
+
+// ═══ PAGES ═══
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const isStore = ['home','shop','product','cart','checkout','success','about'].includes(name);
+  document.getElementById('main-nav').style.display = (name==='dashboard'||name==='dash-login') ? 'none' : 'flex';
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const navEl = document.getElementById('nav-'+name);
+  if(navEl) navEl.classList.add('active');
+  if(name==='cart') renderCartPage();
+  if(name==='shop') initStore();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══ DASHBOARD ═══
+function showDashLogin() { showPage('dash-login'); }
+function dashLogin() {
+  const pw = document.getElementById('dash-password').value;
+  if(pw === ADMIN_PASSWORD) { showPage('dashboard'); loadDashboard(); }
+  else { showToast('Wrong password / كلمة السر خاطئة'); }
+}
+async function loadDashboard() {
+  const products = await loadProducts();
+  const orders = await loadOrders();
+  document.getElementById('stat-products').textContent = products.length;
+  document.getElementById('stat-orders').textContent = orders.length;
+  document.getElementById('stat-revenue').textContent = orders.reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('stat-new-orders').textContent = orders.filter(o=>o.status==='new').length;
+  renderOrdersTable(orders.slice(0,5), 'recent-orders-table');
+  renderProductsTable(products);
+  renderOrdersTable(orders, 'orders-table');
+}
+function renderProductsTable(products) {
+  const el = document.getElementById('products-table');
+  if(!products.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No products yet. Click "Add Product" to start!</p>'; return; }
+  el.innerHTML = `<table class="dash-table"><thead><tr><th>Product</th><th>Arabic Name</th><th>Category</th><th>Price</th><th>Badge</th><th>Actions</th></tr></thead><tbody>${products.map(p=>`<tr><td style="font-weight:500">${p.name}</td><td style="direction:rtl">${p.name_ar||'-'}</td><td>${p.category||'-'}</td><td>SAR ${p.price}</td><td>${p.badge?`<span class="status-badge status-new">${p.badge}</span>`:'-'}</td><td><div style="display:flex;gap:.5rem"><button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})"><i class="ti ti-edit"></i></button><button class="btn btn-red btn-sm" onclick="deleteProduct(${p.id})"><i class="ti ti-trash"></i></button></div></td></tr>`).join('')}</tbody></table>`;
+}
+function renderOrdersTable(orders, containerId) {
+  const el = document.getElementById(containerId);
+  if(!orders||!orders.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No orders yet.</p>'; return; }
+  el.innerHTML = `<table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer_name||'-'}</td><td>${o.customer_phone||'-'}</td><td>SAR ${o.total||0}</td><td>${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table>`;
+}
+function showDashSection(name, el) {
+  document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.dash-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('dash-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ═══ PRODUCT MODAL ═══
+function openProductModal(p) {
+  selectedColor = '#7DB55A';
+  document.getElementById('modal-title').textContent = p ? 'Edit Product' : 'Add New Product';
+  document.getElementById('edit-product-id').value = p ? p.id : '';
+  document.getElementById('p-name').value = p?.name||'';
+  document.getElementById('p-name-ar').value = p?.name_ar||'';
+  document.getElementById('p-price').value = p?.price||'';
+  document.getElementById('p-old-price').value = p?.old_price||'';
+  document.getElementById('p-category').value = p?.category||'oils';
+  document.getElementById('p-badge').value = p?.badge||'';
+  document.getElementById('p-desc').value = p?.description||'';
+  document.getElementById('p-desc-ar').value = p?.description_ar||'';
+  document.getElementById('p-image').value = p?.image_url||'';
+  document.getElementById('p-color').value = p?.color||'#7DB55A';
+  selectedColor = p?.color||'#7DB55A';
+  previewImage(p?.image_url||'');
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+  document.getElementById('product-modal').classList.add('open');
+}
+function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
+async function saveProduct() {
+  const id = document.getElementById('edit-product-id').value;
+  const product = {
+    name: document.getElementById('p-name').value,
+    name_ar: document.getElementById('p-name-ar').value,
+    price: parseFloat(document.getElementById('p-price').value),
+    old_price: parseFloat(document.getElementById('p-old-price').value)||null,
+    category: document.getElementById('p-category').value,
+    badge: document.getElementById('p-badge').value||null,
+    description: document.getElementById('p-desc').value,
+    description_ar: document.getElementById('p-desc-ar').value,
+    image_url: document.getElementById('p-image').value||null,
+    color: selectedColor,
+    in_stock: true
+  };
+  if(!product.name||!product.price){ showToast('Please fill name and price'); return; }
+  if(id) product.id = parseInt(id);
+  const {error} = await saveProductDB(product);
+  if(error){ showToast('Error saving product'); console.error(error); return; }
+  showToast(id ? 'Product updated!' : 'Product added!');
+  closeProductModal();
+  await loadDashboard();
+  await initStore();
+}
+async function editProduct(id) {
+  const {data} = await sb.from('products').select('*').eq('id',id).single();
+  if(data) openProductModal(data);
+}
+async function deleteProduct(id) {
+  if(!confirm('Delete this product?')) return;
+  await deleteProductDB(id);
+  showToast('Product deleted');
+  await loadDashboard();
+  await initStore();
+}
+function selectColor(color, el) {
+  selectedColor = color;
+  document.getElementById('p-color').value = color;
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function previewImage(url) {
+  const preview = document.getElementById('img-preview');
+  if(url && url.startsWith('http')) preview.innerHTML = `<img src="${url}" alt="preview"/>`;
+  else preview.innerHTML = '<i class="ti ti-photo" style="font-size:32px;color:var(--muted)"></i>';
+}
+
+// ═══ UTILS ═══
+function setLang(lang, btn) { document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.documentElement.dir=lang==='ar'?'rtl':'ltr'; }
+function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
+function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
+
+// ═══ INIT ═══
+initStore();
+</script>
+</body>
+</html>
