@@ -411,8 +411,8 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div class="order-summary">
         <h3>Order Summary</h3>
         <div id="checkout-items"></div>
-        <div class="order-total"><span>Total</span><span id="checkout-total">SAR 0</span></div>
-        <div style="margin-top:1rem;padding:.8rem;background:rgba(125,181,90,.12);font-size:12px;color:var(--green-dark);text-align:center"><i class="ti ti-truck"></i> Free shipping over SAR 150</div>
+        <div class="order-total"><span>Total</span><span id="checkout-total">EGP 0</span></div>
+        <div style="margin-top:1rem;padding:.8rem;background:rgba(125,181,90,.12);font-size:12px;color:var(--green-dark);text-align:center"><i class="ti ti-truck"></i> Free shipping over EGP 150</div>
       </div>
     </div>
   </div>
@@ -490,7 +490,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-num" id="stat-products">0</div><div class="stat-label">Total Products</div></div>
           <div class="stat-card"><div class="stat-num" id="stat-orders">0</div><div class="stat-label">Total Orders</div></div>
-          <div class="stat-card"><div class="stat-num" id="stat-revenue">0</div><div class="stat-label">Total Revenue (SAR)</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-revenue">0</div><div class="stat-label">Total Revenue (EGP)</div></div>
           <div class="stat-card"><div class="stat-num" id="stat-new-orders">0</div><div class="stat-label">New Orders</div></div>
         </div>
         <div class="dash-card">
@@ -530,7 +530,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <div class="product-form">
       <div class="form-group"><label>Product Name (English)</label><input type="text" id="p-name" placeholder="e.g. Argan Oil"/></div>
       <div class="form-group"><label>اسم المنتج (عربي)</label><input type="text" id="p-name-ar" placeholder="مثال: زيت الأرغان"/></div>
-      <div class="form-group"><label>Price (SAR)</label><input type="number" id="p-price" placeholder="89"/></div>
+      <div class="form-group"><label>Price (EGP)</label><input type="number" id="p-price" placeholder="1500"/></div>
       <div class="form-group"><label>Old Price (optional)</label><input type="number" id="p-old-price" placeholder="120"/></div>
       <div class="form-group"><label>Category</label>
         <select id="p-category">
@@ -634,7 +634,7 @@ function renderCard(p, container) {
     <div class="stars">★★★★★</div>
     <div class="pname">${p.name||''}</div>
     <div class="pname-ar">${p.name_ar||''}</div>
-    <div class="pprice">${p.old_price?`<span class="old">SAR ${p.old_price}</span>`:''}SAR ${p.price}</div>
+    <div class="pprice">${p.old_price?`<span class="old">EGP ${p.old_price}</span>`:''}EGP ${p.price}</div>
   `;
   card.addEventListener('click', () => showProduct(p));
   container.appendChild(card);
@@ -680,7 +680,7 @@ function showProduct(p) {
       <h2 class="pd-title">${p.name||''}</h2>
       <p class="pd-title-ar">${p.name_ar||''}</p>
       <div class="stars" style="font-size:16px;margin-bottom:1rem">★★★★★</div>
-      <div class="pd-price">${p.old_price?`<span style="text-decoration:line-through;color:var(--muted);font-size:22px;margin-right:12px">SAR ${p.old_price}</span>`:''}SAR ${p.price}</div>
+      <div class="pd-price">${p.old_price?`<span style="text-decoration:line-through;color:var(--muted);font-size:22px;margin-right:12px">EGP ${p.old_price}</span>`:''}EGP ${p.price}</div>
       <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;font-weight:300">${p.description||''}</p>
       <p style="font-size:13px;color:var(--muted);direction:rtl;line-height:1.9;margin-bottom:1.5rem;font-weight:300">${p.description_ar||''}</p>
       <div class="qty-wrap">
@@ -716,15 +716,15 @@ function renderCartPage() {
   const summary = document.getElementById('cart-summary-container');
   if(!cart.length){ container.innerHTML='<div style="text-align:center;padding:4rem;color:var(--muted)"><i class="ti ti-shopping-bag" style="font-size:48px;opacity:.3"></i><p style="margin-top:1rem;font-size:14px">Your cart is empty / سلتك فارغة</p></div>'; summary.innerHTML=''; return; }
   let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  container.innerHTML = `<table class="cart-table"><thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody>${cart.map(i=>`<tr><td><div style="display:flex;align-items:center;gap:1rem">${i.image_url?`<img src="${i.image_url}" style="width:60px;height:70px;object-fit:cover;background:var(--green-light)">`:`<div style="width:60px;height:70px;background:${i.color||'var(--green-light)'};opacity:.3"></div>`}<div><div style="font-size:13px">${i.name}</div><div style="font-size:11px;color:var(--muted);direction:rtl">${i.name_ar||''}</div></div></div></td><td>SAR ${i.price}</td><td><div style="display:flex;align-items:center;gap:.5rem"><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},-1)">−</button><span style="min-width:20px;text-align:center">${i.qty}</span><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},1)">+</button></div></td><td>SAR ${i.price*i.qty}</td><td><i class="ti ti-trash" style="cursor:pointer;color:var(--muted)" onclick="removeFromCart(${i.id})"></i></td></tr>`).join('')}</tbody></table>`;
+  container.innerHTML = `<table class="cart-table"><thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody>${cart.map(i=>`<tr><td><div style="display:flex;align-items:center;gap:1rem">${i.image_url?`<img src="${i.image_url}" style="width:60px;height:70px;object-fit:cover;background:var(--green-light)">`:`<div style="width:60px;height:70px;background:${i.color||'var(--green-light)'};opacity:.3"></div>`}<div><div style="font-size:13px">${i.name}</div><div style="font-size:11px;color:var(--muted);direction:rtl">${i.name_ar||''}</div></div></div></td><td>EGP ${i.price}</td><td><div style="display:flex;align-items:center;gap:.5rem"><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},-1)">−</button><span style="min-width:20px;text-align:center">${i.qty}</span><button class="qty-btn" style="width:28px;height:28px;font-size:14px" onclick="updateQtyCart(${i.id},1)">+</button></div></td><td>EGP ${i.price*i.qty}</td><td><i class="ti ti-trash" style="cursor:pointer;color:var(--muted)" onclick="removeFromCart(${i.id})"></i></td></tr>`).join('')}</tbody></table>`;
   const shipping = total >= 150 ? 0 : 25;
-  summary.innerHTML = `<div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>SAR ${total}</span></div><div class="summary-row"><span>Shipping</span><span>${shipping===0?'<span style="color:var(--green)">Free</span>':'SAR '+shipping}</span></div><div class="summary-total"><span>Total</span><span>SAR ${total+shipping}</span></div><button class="btn btn-green" style="width:100%;justify-content:center;margin-top:1.5rem" onclick="goCheckout()">Checkout — إتمام الشراء <i class="ti ti-arrow-right"></i></button><button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.8rem" onclick="showPage('shop')">Continue Shopping</button></div>`;
+  summary.innerHTML = `<div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>EGP ${total}</span></div><div class="summary-row"><span>Shipping</span><span>${shipping===0?'<span style="color:var(--green)">Free</span>':'EGP '+shipping}</span></div><div class="summary-total"><span>Total</span><span>EGP ${total+shipping}</span></div><button class="btn btn-green" style="width:100%;justify-content:center;margin-top:1.5rem" onclick="goCheckout()">Checkout — إتمام الشراء <i class="ti ti-arrow-right"></i></button><button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:.8rem" onclick="showPage('shop')">Continue Shopping</button></div>`;
 }
 function goCheckout() {
   let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
   let shipping = total>=150?0:25;
-  document.getElementById('checkout-items').innerHTML = cart.map(i=>`<div class="order-item"><span>${i.name} × ${i.qty}</span><span>SAR ${i.price*i.qty}</span></div>`).join('') + `<div class="order-item"><span>Shipping</span><span>${shipping===0?'Free':'SAR '+shipping}</span></div>`;
-  document.getElementById('checkout-total').textContent = `SAR ${total+shipping}`;
+  document.getElementById('checkout-items').innerHTML = cart.map(i=>`<div class="order-item"><span>${i.name} × ${i.qty}</span><span>EGP ${i.price*i.qty}</span></div>`).join('') + `<div class="order-item"><span>Shipping</span><span>${shipping===0?'Free':'EGP '+shipping}</span></div>`;
+  document.getElementById('checkout-total').textContent = `EGP ${total+shipping}`;
   showPage('checkout');
 }
 async function placeOrder() {
@@ -782,12 +782,12 @@ async function loadDashboard() {
 function renderProductsTable(products) {
   const el = document.getElementById('products-table');
   if(!products.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No products yet. Click "Add Product" to start!</p>'; return; }
-  el.innerHTML = `<table class="dash-table"><thead><tr><th>Product</th><th>Arabic Name</th><th>Category</th><th>Price</th><th>Badge</th><th>Actions</th></tr></thead><tbody>${products.map(p=>`<tr><td style="font-weight:500">${p.name}</td><td style="direction:rtl">${p.name_ar||'-'}</td><td>${p.category||'-'}</td><td>SAR ${p.price}</td><td>${p.badge?`<span class="status-badge status-new">${p.badge}</span>`:'-'}</td><td><div style="display:flex;gap:.5rem"><button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})"><i class="ti ti-edit"></i></button><button class="btn btn-red btn-sm" onclick="deleteProduct(${p.id})"><i class="ti ti-trash"></i></button></div></td></tr>`).join('')}</tbody></table>`;
+  el.innerHTML = `<table class="dash-table"><thead><tr><th>Product</th><th>Arabic Name</th><th>Category</th><th>Price</th><th>Badge</th><th>Actions</th></tr></thead><tbody>${products.map(p=>`<tr><td style="font-weight:500">${p.name}</td><td style="direction:rtl">${p.name_ar||'-'}</td><td>${p.category||'-'}</td><td>EGP ${p.price}</td><td>${p.badge?`<span class="status-badge status-new">${p.badge}</span>`:'-'}</td><td><div style="display:flex;gap:.5rem"><button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})"><i class="ti ti-edit"></i></button><button class="btn btn-red btn-sm" onclick="deleteProduct(${p.id})"><i class="ti ti-trash"></i></button></div></td></tr>`).join('')}</tbody></table>`;
 }
 function renderOrdersTable(orders, containerId) {
   const el = document.getElementById(containerId);
   if(!orders||!orders.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No orders yet.</p>'; return; }
-  el.innerHTML = `<table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer_name||'-'}</td><td>${o.customer_phone||'-'}</td><td>SAR ${o.total||0}</td><td>${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table>`;
+  el.innerHTML = `<table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer_name||'-'}</td><td>${o.customer_phone||'-'}</td><td>EGP ${o.total||0}</td><td>${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table>`;
 }
 function showDashSection(name, el) {
   document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
