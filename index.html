@@ -216,9 +216,22 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast i{color:var(--green);margin-right:8px}
 
+/* MOBILE MENU */
+.mob-menu-btn{display:none;background:none;border:none;cursor:pointer;font-size:22px;color:var(--dark)}
+.mob-menu{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300}
+.mob-menu-inner{position:absolute;top:0;right:0;width:75%;max-width:280px;height:100%;background:var(--cream);padding:2rem 1.5rem;overflow-y:auto}
+.mob-menu-inner .mob-close{font-size:22px;cursor:pointer;margin-bottom:2rem;display:block}
+.mob-menu-inner a{display:block;padding:.9rem 0;font-size:14px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:.5px solid rgba(30,42,24,.08);cursor:pointer;color:var(--dark);text-decoration:none}
+.mob-menu-inner a:hover{color:var(--green)}
+.mob-menu.open{display:block}
 @media(max-width:768px){
-  nav{padding:1rem 1.2rem}.nav-links{display:none}
-  .hero{grid-template-columns:1fr}.hero-right{display:none}.hero-left{padding:3rem 1.5rem}.hero-title{font-size:38px}
+  nav{padding:.8rem 1.2rem}.nav-links{display:none}.mob-menu-btn{display:block}
+  .hero{grid-template-columns:1fr;min-height:auto}
+  .hero-left{padding:2.5rem 1.5rem}
+  .hero-title{font-size:36px}
+  .hero-right{display:none}
+  .hero-title-ar{font-size:22px}
+  .hero-sub{font-size:12px}
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .section{padding:3rem 1.2rem}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
@@ -229,6 +242,10 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   .dash-sidebar{display:none}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .product-form{grid-template-columns:1fr}
+  .bs-inner{grid-template-columns:1fr}
+  .nl-form{flex-direction:column}
+  .nl-btn{width:100%}
+  .cart-table th:nth-child(2),.cart-table td:nth-child(2){display:none}
 }
 </style>
 </head>
@@ -264,8 +281,26 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <i class="ti ti-shopping-bag"></i>
       <span class="cart-count" id="cart-count">0</span>
     </div>
+    <button class="mob-menu-btn" onclick="document.getElementById('mob-menu').classList.toggle('open')"><i class="ti ti-menu-2"></i></button>
   </div>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mob-menu" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="mob-menu-inner">
+    <span class="mob-close" onclick="document.getElementById('mob-menu').classList.remove('open')"><i class="ti ti-x"></i></span>
+    <a onclick="showPage('home');document.getElementById('mob-menu').classList.remove('open')">🏠 Home / الرئيسية</a>
+    <a onclick="showPage('shop');document.getElementById('mob-menu').classList.remove('open')">🛍️ Shop / تسوق</a>
+    <a onclick="showPage('about');document.getElementById('mob-menu').classList.remove('open')">📖 About / عنا</a>
+    <a onclick="showDashLogin();document.getElementById('mob-menu').classList.remove('open')" style="color:var(--muted)">🔐 Admin</a>
+    <div style="margin-top:1.5rem">
+      <div class="lang-toggle" style="justify-content:center;display:flex">
+        <button class="lang-btn active" onclick="setLang('en',this)">EN</button>
+        <button class="lang-btn" onclick="setLang('ar',this)">AR</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ════════════ HOME ════════════ -->
 <div id="page-home" class="page active">
@@ -335,7 +370,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       </div>
       <div><p class="footer-heading">Shop</p><ul class="footer-links"><li><a onclick="showPage('shop')">All Products</a></li><li><a onclick="showPage('shop')">Natural Oils</a></li><li><a onclick="showPage('shop')">Body Butters</a></li><li><a onclick="showPage('shop')">Lip Care</a></li></ul></div>
       <div><p class="footer-heading">Help</p><ul class="footer-links"><li><a>Shipping</a></li><li><a>Returns</a></li><li><a onclick="showPage('cart')">Track Order</a></li><li><a>FAQ</a></li></ul></div>
-      <div><p class="footer-heading">Contact</p><ul class="footer-links"><li><a href="https://wa.me/966500000000" target="_blank">WhatsApp</a></li><li><a href="https://instagram.com/ayodelight" target="_blank">Instagram</a></li><li><a href="mailto:hello@ayodelight.com">Email Us</a></li><li><a onclick="showPage('about')">About Us</a></li></ul></div>
+      <div><p class="footer-heading">Contact</p><ul class="footer-links"><li><a id="footer-wa" href="https://wa.me/201110310887" target="_blank">WhatsApp</a></li><li><a id="footer-ig" href="https://instagram.com/ayodelight.eg" target="_blank">Instagram</a></li><li><a id="footer-fb" href="https://facebook.com/ayodelight" target="_blank">Facebook</a></li><li><a id="footer-email" href="mailto:hello@ayodelight.com">Email Us</a></li><li><a onclick="showPage('about')">About Us</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p class="footer-copy">© 2026 Ayo Delight Natural Products.</p><div class="social-links"><i class="ti ti-brand-instagram"></i><i class="ti ti-brand-tiktok"></i><i class="ti ti-brand-whatsapp"></i></div></div>
   </footer>
@@ -427,7 +462,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <p style="font-size:13px;color:var(--muted);margin-bottom:2rem;line-height:1.9">Thank you for choosing Ayo Delight.<br>سنتواصل معك على واتساب لتأكيد الطلب.</p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
       <button class="btn btn-green" onclick="showPage('home')">Continue Shopping</button>
-      <a href="https://wa.me/966500000000" class="btn btn-outline" target="_blank">Contact Us</a>
+      <a id="success-wa" href="https://wa.me/201110310887" class="btn btn-outline" target="_blank">Contact Us via WhatsApp</a>
     </div>
   </div>
 </div>
@@ -477,6 +512,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div class="dash-nav-item active" onclick="showDashSection('overview',this)"><i class="ti ti-home"></i> Overview</div>
       <div class="dash-nav-item" onclick="showDashSection('products',this)"><i class="ti ti-package"></i> Products / المنتجات</div>
       <div class="dash-nav-item" onclick="showDashSection('orders',this)"><i class="ti ti-shopping-cart"></i> Orders / الطلبات</div>
+      <div class="dash-nav-item" onclick="showDashSection('home-edit',this)"><i class="ti ti-photo"></i> Home Banner / البانر</div>
       <div class="dash-nav-item" onclick="showDashSection('about-edit',this)"><i class="ti ti-file-text"></i> About Page / عن المتجر</div>
       <div class="dash-nav-item" onclick="showDashSection('settings',this)"><i class="ti ti-settings"></i> Settings / الإعدادات</div>
       <div style="position:absolute;bottom:2rem;width:100%">
@@ -517,6 +553,52 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         <div class="dash-header"><h2 class="dash-title">Orders / الطلبات</h2></div>
         <div class="dash-card">
           <div id="orders-table"><div class="loading"><i class="ti ti-loader"></i>Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- HOME BANNER -->
+      <div id="dash-home-edit" class="dash-section">
+        <div class="dash-header"><h2 class="dash-title">Home Banner / البانر الرئيسي</h2></div>
+        <div class="dash-card" style="margin-bottom:1.5rem">
+          <h3 class="dash-card-title" style="margin-bottom:1.5rem">Hero Banner Image / صورة البانر</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1rem">Upload an image to replace the right side of the home banner. Recommended: 800×600px</p>
+          <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap">
+            <div id="banner-preview-box" style="width:280px;height:180px;background:var(--green-light);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+              <img id="banner-preview-img" style="width:100%;height:100%;object-fit:cover;display:none"/>
+              <i class="ti ti-photo" style="font-size:40px;color:var(--muted)" id="banner-icon"></i>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-bottom:1rem">
+                <i class="ti ti-upload"></i> Upload Banner Image
+                <input type="file" accept="image/*" style="display:none" onchange="uploadBannerImage(this)"/>
+              </label>
+              <p style="font-size:11px;color:var(--muted);margin-bottom:.8rem">Or paste URL:</p>
+              <input type="url" id="banner-url" placeholder="https://..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none" oninput="previewBannerUrl(this.value)"/>
+              <button class="btn btn-green" style="margin-top:1rem" onclick="saveBanner()"><i class="ti ti-check"></i> Apply Banner</button>
+            </div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <h3 class="dash-card-title" style="margin-bottom:1.5rem">Hero Text / نص البانر</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+            <div>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Title (English)</label>
+              <input type="text" id="banner-title-en" value="Nature's Finest," style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Subtitle (English) — italic</label>
+              <input type="text" id="banner-sub-en" value="Your Delight" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Arabic Title / العنوان بالعربي</label>
+              <input type="text" id="banner-title-ar" value="أفضل ما في الطبيعة، بهجتك أنت" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;direction:rtl"/>
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Description</label>
+              <textarea id="banner-desc" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</textarea>
+            </div>
+          </div>
+          <button class="btn btn-green" style="margin-top:1.5rem" onclick="saveBannerText()"><i class="ti ti-check"></i> Save Text</button>
         </div>
       </div>
 
@@ -586,15 +668,19 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
             <div>
               <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">WhatsApp Number</label>
-              <input type="tel" id="setting-whatsapp" placeholder="+201XXXXXXXXX" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+              <input type="tel" id="setting-whatsapp" placeholder="+201XXXXXXXXX" value="01110310887" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
             </div>
             <div>
               <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Email</label>
               <input type="email" id="setting-email" placeholder="hello@ayodelight.com" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
             </div>
             <div>
-              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Instagram</label>
-              <input type="text" id="setting-instagram" placeholder="@ayodelight" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Instagram Username</label>
+              <input type="text" id="setting-instagram" placeholder="ayodelight.eg" value="ayodelight.eg" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Facebook Username</label>
+              <input type="text" id="setting-facebook" placeholder="ayodelight" value="ayodelight" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
             </div>
             <div>
               <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Currency / العملة</label>
@@ -685,6 +771,14 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
       <button class="btn btn-green" onclick="saveProduct()"><i class="ti ti-check"></i> Save Product</button>
     </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal">
+    <h3 class="modal-title" id="order-modal-title">Order Details</h3>
+    <div id="order-modal-content"></div>
   </div>
 </div>
 
@@ -901,7 +995,49 @@ function renderProductsTable(products) {
 function renderOrdersTable(orders, containerId) {
   const el = document.getElementById(containerId);
   if(!orders||!orders.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No orders yet.</p>'; return; }
-  el.innerHTML = `<table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer_name||'-'}</td><td>${o.customer_phone||'-'}</td><td>EGP ${o.total||0}</td><td>${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table>`;
+  el.innerHTML = `<table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Details</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td>${o.customer_name||'-'}</td><td><a href="https://wa.me/${(o.customer_phone||'').replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green)">${o.customer_phone||'-'}</a></td><td>EGP ${o.total||0}</td><td>${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td>${new Date(o.created_at).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="showOrderDetails(${JSON.stringify(JSON.stringify(o))})"><i class="ti ti-eye"></i> View</button></td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Jost'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table>`;
+}
+
+function showOrderDetails(orderJson) {
+  const o = JSON.parse(orderJson);
+  const items = Array.isArray(o.items) ? o.items : [];
+  const waNum = (o.customer_phone||'').replace(/[^0-9]/g,'');
+  const modal = document.getElementById('order-modal');
+  document.getElementById('order-modal-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+      <div>
+        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Customer</p>
+        <p style="font-size:15px;font-weight:500">${o.customer_name||'-'}</p>
+      </div>
+      <div>
+        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Phone</p>
+        <p style="font-size:15px"><a href="https://wa.me/${waNum}" target="_blank" style="color:var(--green)">${o.customer_phone||'-'} <i class="ti ti-brand-whatsapp"></i></a></p>
+      </div>
+      <div>
+        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Email</p>
+        <p style="font-size:14px">${o.customer_email||'-'}</p>
+      </div>
+      <div>
+        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Payment</p>
+        <p style="font-size:14px">${o.payment_method||'-'}</p>
+      </div>
+      <div style="grid-column:1/-1">
+        <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">Address</p>
+        <p style="font-size:14px">${o.customer_address||'-'}, ${o.city||''}, ${o.country||''}</p>
+      </div>
+    </div>
+    <div style="background:var(--green-light);padding:1.2rem;margin-bottom:1.5rem">
+      <p style="font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.8rem">Order Items / المنتجات</p>
+      ${items.map(i=>`<div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:.5px solid rgba(30,42,24,.1);font-size:13px"><span>${i.name||''} × ${i.qty||1}</span><span>EGP ${(i.price||0)*(i.qty||1)}</span></div>`).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-family:'Cormorant Garamond',serif;margin-top:.8rem;padding-top:.8rem;border-top:.5px solid rgba(30,42,24,.15)"><span>Total</span><span>EGP ${o.total||0}</span></div>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="https://wa.me/${waNum}?text=Hello ${encodeURIComponent(o.customer_name||'')}! Your Ayo Delight order #${o.id} is confirmed. Total: EGP ${o.total}" target="_blank" class="btn btn-green btn-sm"><i class="ti ti-brand-whatsapp"></i> Message Customer</a>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('order-modal').classList.remove('open')">Close</button>
+    </div>
+  `;
+  document.getElementById('order-modal-title').textContent = `Order #${o.id} — ${o.customer_name}`;
+  modal.classList.add('open');
 }
 function showDashSection(name, el) {
   document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
@@ -979,35 +1115,53 @@ function previewImage(url) {
 }
 
 // ═══ IMAGE UPLOAD TO SUPABASE STORAGE ═══
-async function uploadImageToStorage(file, bucket) {
-  const fileName = `${Date.now()}-${file.name.replace(/\s/g,'_')}`;
-  const {data, error} = await sb.storage.from(bucket).upload(fileName, file, {cacheControl:'3600', upsert:false});
-  if(error){ console.error(error); return null; }
-  const {data: urlData} = sb.storage.from(bucket).getPublicUrl(fileName);
-  return urlData.publicUrl;
-}
-
-async function uploadProductImage(input) {
+function uploadProductImage(input) {
   const file = input.files[0];
   if(!file) return;
-  showToast('Uploading image... جاري الرفع');
-  const url = await uploadImageToStorage(file, 'products');
-  if(url){ document.getElementById('p-image').value = url; previewImage(url); showToast('Image uploaded! تم رفع الصورة ✅'); }
-  else { showToast('Upload failed. Try creating "products" bucket in Supabase Storage first.'); }
+  if(file.size > 3*1024*1024){ showToast('Image too large. Max 3MB / الصورة كبيرة جداً'); return; }
+  showToast('Processing image... جاري المعالجة');
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Compress image
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 800;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = h*(MAX/w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      document.getElementById('p-image').value = dataUrl;
+      previewImage(dataUrl);
+      showToast('Image ready! الصورة جاهزة ✅');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
-async function uploadLogoFile(input) {
+function uploadLogoFile(input) {
   const file = input.files[0];
   if(!file) return;
-  showToast('Uploading logo...');
-  const url = await uploadImageToStorage(file, 'logos');
-  if(url){ previewLogoUrl(url); document.getElementById('logo-url-input').value = url; showToast('Logo uploaded! ✅'); }
-  else {
-    const reader = new FileReader();
-    reader.onload = e => { previewLogoUrl(e.target.result); document.getElementById('logo-url-input').value = e.target.result; };
-    reader.readAsDataURL(file);
-    showToast('Using local preview (create "logos" bucket in Supabase for permanent storage)');
-  }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 400;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = h*(MAX/w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/png', 0.9);
+      previewLogoUrl(dataUrl);
+      document.getElementById('logo-url-input').value = dataUrl;
+      showToast('Logo ready! الشعار جاهز ✅');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 function previewLogoUrl(url) {
@@ -1055,10 +1209,25 @@ function saveSettings() {
     whatsapp: document.getElementById('setting-whatsapp').value,
     email: document.getElementById('setting-email').value,
     instagram: document.getElementById('setting-instagram').value,
+    facebook: document.getElementById('setting-facebook')?.value || '',
     currency: document.getElementById('setting-currency').value
   };
   localStorage.setItem('ayo_settings', JSON.stringify(data));
-  showToast('Settings saved! ✅');
+  applySettings(data);
+  showToast('Settings saved! تم الحفظ ✅');
+}
+
+function applySettings(d) {
+  if(!d) return;
+  const wa = d.whatsapp ? d.whatsapp.replace(/[^0-9]/g,'') : '201110310887';
+  const waLink = 'https://wa.me/' + (wa.startsWith('0') ? '2'+wa.slice(1) : wa);
+  const waEl = document.getElementById('footer-wa');
+  const waSuccess = document.getElementById('success-wa');
+  if(waEl) waEl.href = waLink;
+  if(waSuccess) waSuccess.href = waLink;
+  if(d.instagram) { const igEl = document.getElementById('footer-ig'); if(igEl) igEl.href = 'https://instagram.com/'+d.instagram.replace('@',''); }
+  if(d.facebook) { const fbEl = document.getElementById('footer-fb'); if(fbEl) fbEl.href = 'https://facebook.com/'+d.facebook.replace('@',''); }
+  if(d.email) { const emEl = document.getElementById('footer-email'); if(emEl) emEl.href = 'mailto:'+d.email; }
 }
 
 function changePassword() {
@@ -1081,10 +1250,12 @@ function loadSavedSettings() {
   if(settings) {
     try {
       const d = JSON.parse(settings);
-      if(d.whatsapp) document.getElementById('setting-whatsapp').value = d.whatsapp;
-      if(d.email) document.getElementById('setting-email').value = d.email;
-      if(d.instagram) document.getElementById('setting-instagram').value = d.instagram;
-      if(d.currency) document.getElementById('setting-currency').value = d.currency;
+      if(d.whatsapp) { const el=document.getElementById('setting-whatsapp'); if(el) el.value=d.whatsapp; }
+      if(d.email) { const el=document.getElementById('setting-email'); if(el) el.value=d.email; }
+      if(d.instagram) { const el=document.getElementById('setting-instagram'); if(el) el.value=d.instagram; }
+      if(d.facebook) { const el=document.getElementById('setting-facebook'); if(el) el.value=d.facebook; }
+      if(d.currency) { const el=document.getElementById('setting-currency'); if(el) el.value=d.currency; }
+      applySettings(d);
     } catch(e){}
   }
 }
@@ -1094,8 +1265,103 @@ function setLang(lang, btn) { document.querySelectorAll('.lang-btn').forEach(b=>
 function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
 function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
 
+// ═══ BANNER FUNCTIONS ═══
+function uploadBannerImage(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 1200;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = h*(MAX/w); w = MAX; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      previewBannerUrl(dataUrl);
+      document.getElementById('banner-url').value = dataUrl;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewBannerUrl(url) {
+  const img = document.getElementById('banner-preview-img');
+  const icon = document.getElementById('banner-icon');
+  if(url && url.length > 5){ img.src=url; img.style.display='block'; if(icon) icon.style.display='none'; }
+}
+
+function saveBanner() {
+  const url = document.getElementById('banner-url').value;
+  if(!url){ showToast('Please upload or paste a banner URL'); return; }
+  localStorage.setItem('ayo_banner', url);
+  applyBannerImage(url);
+  showToast('Banner saved! تم حفظ البانر ✅');
+}
+
+function applyBannerImage(url) {
+  const heroRight = document.querySelector('.hero-right');
+  if(heroRight && url) {
+    heroRight.style.backgroundImage = `url(${url})`;
+    heroRight.style.backgroundSize = 'cover';
+    heroRight.style.backgroundPosition = 'center';
+    const svg = heroRight.querySelector('svg');
+    if(svg) svg.style.display = 'none';
+  }
+}
+
+function saveBannerText() {
+  const data = {
+    title_en: document.getElementById('banner-title-en').value,
+    sub_en: document.getElementById('banner-sub-en').value,
+    title_ar: document.getElementById('banner-title-ar').value,
+    desc: document.getElementById('banner-desc').value
+  };
+  localStorage.setItem('ayo_banner_text', JSON.stringify(data));
+  applyBannerText(data);
+  showToast('Banner text saved! ✅');
+}
+
+function applyBannerText(d) {
+  if(!d) return;
+  const titleEl = document.querySelector('.hero-title');
+  if(titleEl && d.title_en) titleEl.innerHTML = d.title_en + '<br><em>' + d.sub_en + '</em>';
+  const arEl = document.querySelector('.hero-title-ar');
+  if(arEl && d.title_ar) arEl.textContent = d.title_ar;
+  const descEl = document.querySelector('.hero-sub');
+  if(descEl && d.desc) descEl.textContent = d.desc;
+}
+
+function loadBannerSettings() {
+  const banner = localStorage.getItem('ayo_banner');
+  if(banner) {
+    applyBannerImage(banner);
+    const pImg = document.getElementById('banner-preview-img');
+    if(pImg){ pImg.src=banner; pImg.style.display='block'; }
+    const urlInp = document.getElementById('banner-url');
+    if(urlInp) urlInp.value = banner;
+    const icon = document.getElementById('banner-icon');
+    if(icon) icon.style.display='none';
+  }
+  const bannerText = localStorage.getItem('ayo_banner_text');
+  if(bannerText) {
+    try {
+      const d = JSON.parse(bannerText);
+      applyBannerText(d);
+      if(document.getElementById('banner-title-en')) document.getElementById('banner-title-en').value = d.title_en||'';
+      if(document.getElementById('banner-sub-en')) document.getElementById('banner-sub-en').value = d.sub_en||'';
+      if(document.getElementById('banner-title-ar')) document.getElementById('banner-title-ar').value = d.title_ar||'';
+      if(document.getElementById('banner-desc')) document.getElementById('banner-desc').value = d.desc||'';
+    } catch(e){}
+  }
+}
+
 // ═══ INIT ═══
 loadSavedSettings();
+loadBannerSettings();
 initStore();
 </script>
 </body>
