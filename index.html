@@ -44,19 +44,26 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 /* HERO */
 /* FULL WIDTH BANNER */
 .hero{position:relative;width:100%;min-height:520px;overflow:hidden;display:flex;align-items:center}
-.hero-bg{position:absolute;inset:0;background:var(--green-light);background-size:cover;background-position:center;z-index:0;transition:all .3s}
-.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(238,245,232,.95) 0%,rgba(238,245,232,.85) 40%,rgba(238,245,232,.2) 70%,transparent 100%)}
-.hero-left{position:relative;z-index:1;padding:4rem 3.5rem;max-width:600px}
-.hero-tag{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--green-dark);margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
-.hero-tag::before{content:'';width:24px;height:1px;background:var(--green)}
-.hero-title{font-family:'Cormorant Garamond',serif;font-size:58px;font-weight:300;line-height:1.05;margin-bottom:.5rem}
-.hero-title em{font-style:italic;color:var(--green)}
-.hero-title-ar{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--muted);direction:rtl;margin-bottom:1.5rem}
-.hero-sub{font-size:13px;font-weight:300;color:var(--muted);line-height:1.9;max-width:400px;margin-bottom:2.5rem}
+/* Slider container */
+.hero-slider{position:absolute;inset:0;z-index:0}
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .8s ease;background-color:var(--green-light)}
+.hero-slide.active{opacity:1}
+/* NO white overlay — image shows fully */
+.hero-left{display:none}
 .hero-right{display:none}
-.hero-badge{position:absolute;bottom:2rem;right:2rem;z-index:2;background:rgba(255,255,255,.92);padding:14px 20px;backdrop-filter:blur(4px)}
-.hero-badge strong{display:block;font-size:22px;font-family:'Cormorant Garamond',serif;font-weight:400;color:var(--green-dark)}
-.hero-badge span{font-size:11px;color:var(--muted);letter-spacing:1px}
+.hero-badge{display:none}
+/* Slider dots */
+.hero-dots{position:absolute;bottom:1.2rem;left:50%;transform:translateX(-50%);z-index:3;display:flex;gap:.5rem}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:all .3s;border:none;padding:0}
+.hero-dot.active{background:#fff;width:22px;border-radius:4px}
+/* Slider arrows */
+.hero-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;background:rgba(255,255,255,.25);border:none;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;transition:background .2s;backdrop-filter:blur(4px)}
+.hero-arrow:hover{background:rgba(255,255,255,.45)}
+.hero-arrow-left{left:1rem}
+.hero-arrow-right{right:1rem}
+/* No-image placeholder */
+.hero-placeholder{position:absolute;inset:0;background:var(--green-light);display:flex;align-items:center;justify-content:center;z-index:1}
+.hero-placeholder-text{text-align:center;color:var(--muted);font-size:13px}
 
 /* FEATURES */
 .features-bar{background:var(--dark);padding:2rem 2.5rem}
@@ -232,10 +239,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   .hero{min-height:380px}
   .hero-left{padding:2rem 1.5rem}
   .hero-title{font-size:34px}
-  .hero-bg::after{background:linear-gradient(180deg,rgba(238,245,232,.97) 0%,rgba(238,245,232,.9) 60%,rgba(238,245,232,.5) 100%)}
-  .hero-title-ar{font-size:20px}
-  .hero-sub{font-size:12px}
-  .hero-badge{display:none}
+  .hero{min-height:260px}
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .section{padding:3rem 1.2rem}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
@@ -309,18 +313,19 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 <!-- ════════════ HOME ════════════ -->
 <div id="page-home" class="page active">
   <div class="hero" id="main-hero">
-    <div class="hero-bg" id="hero-bg"></div>
-    <div class="hero-left">
-      <p class="hero-tag" id="hero-tag-text">100% Natural &amp; Organic</p>
-      <h1 class="hero-title" id="hero-title-el">Nature's Finest,<br><em id="hero-sub-el">Your Delight</em></h1>
-      <p class="hero-title-ar" id="hero-ar-el">أفضل ما في الطبيعة، بهجتك أنت</p>
-      <p class="hero-sub" id="hero-desc-el">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</p>
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap">
-        <button class="btn btn-green" onclick="showPage('shop')">Shop Now <i class="ti ti-arrow-right"></i></button>
-        <button class="btn btn-outline" onclick="showPage('about')">Our Story</button>
+    <div class="hero-slider" id="hero-slider">
+      <!-- slides injected by JS -->
+      <div class="hero-placeholder" id="hero-placeholder">
+        <div class="hero-placeholder-text">
+          <i class="ti ti-photo" style="font-size:48px;display:block;margin-bottom:1rem;color:var(--green)"></i>
+          <p>أضف صور البانر من لوحة التحكم</p>
+          <p style="font-size:11px;margin-top:.3rem;opacity:.6">Admin → Home Banner</p>
+        </div>
       </div>
     </div>
-    <div class="hero-badge"><strong>100%</strong><span>Natural</span></div>
+    <button class="hero-arrow hero-arrow-left" id="hero-prev" onclick="sliderPrev()" style="display:none"><i class="ti ti-chevron-left"></i></button>
+    <button class="hero-arrow hero-arrow-right" id="hero-next" onclick="sliderNext()" style="display:none"><i class="ti ti-chevron-right"></i></button>
+    <div class="hero-dots" id="hero-dots"></div>
   </div>
   <div class="features-bar">
     <div class="features-grid">
@@ -602,45 +607,32 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div id="dash-home-edit" class="dash-section">
         <div class="dash-header"><h2 class="dash-title">Home Banner / البانر الرئيسي</h2></div>
         <div class="dash-card" style="margin-bottom:1.5rem">
-          <h3 class="dash-card-title" style="margin-bottom:1.5rem">Hero Banner Image / صورة البانر</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:1rem">Upload an image to replace the right side of the home banner. Recommended: 800×600px</p>
-          <div style="display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap">
-            <div id="banner-preview-box" style="width:280px;height:180px;background:var(--green-light);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center">
-              <img id="banner-preview-img" style="width:100%;height:100%;object-fit:cover;display:none"/>
-              <i class="ti ti-photo" style="font-size:40px;color:var(--muted)" id="banner-icon"></i>
-            </div>
-            <div style="flex:1;min-width:200px">
-              <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-bottom:1rem">
-                <i class="ti ti-upload"></i> Upload Banner Image
-                <input type="file" accept="image/*" style="display:none" onchange="uploadBannerImage(this)"/>
-              </label>
-              <p style="font-size:11px;color:var(--muted);margin-bottom:.8rem">Or paste URL:</p>
-              <input type="url" id="banner-url" placeholder="https://..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none" oninput="previewBannerUrl(this.value)"/>
-              <button class="btn btn-green" style="margin-top:1rem" onclick="saveBanner()"><i class="ti ti-check"></i> Apply Banner</button>
-            </div>
-          </div>
-        </div>
-        <div class="dash-card">
-          <h3 class="dash-card-title" style="margin-bottom:1.5rem">Hero Text / نص البانر</h3>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-            <div>
-              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Title (English)</label>
-              <input type="text" id="banner-title-en" value="Nature's Finest," style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
-            </div>
-            <div>
-              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Subtitle (English) — italic</label>
-              <input type="text" id="banner-sub-en" value="Your Delight" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
-            </div>
-            <div style="grid-column:1/-1">
-              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Arabic Title / العنوان بالعربي</label>
-              <input type="text" id="banner-title-ar" value="أفضل ما في الطبيعة، بهجتك أنت" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;direction:rtl"/>
-            </div>
-            <div style="grid-column:1/-1">
-              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Description</label>
-              <textarea id="banner-desc" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical">Handcrafted natural oils, scented body butters &amp; nourishing lip care — made with love from the purest ingredients.</textarea>
+          <h3 class="dash-card-title" style="margin-bottom:.5rem">Banner Images / صور البانر</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1.5rem">يمكنك إضافة أكثر من صورة — ستتحرك تلقائياً كسلايدر. Recommended: 1600×600px or wider landscape images.</p>
+
+          <!-- Upload new image -->
+          <div style="border:.5px dashed rgba(30,42,24,.25);padding:1.5rem;border-radius:4px;text-align:center;margin-bottom:1.5rem;background:var(--green-light)">
+            <i class="ti ti-cloud-upload" style="font-size:36px;color:var(--green);margin-bottom:.8rem;display:block"></i>
+            <p style="font-size:13px;margin-bottom:1rem;color:var(--dark)">رفع صورة جديدة للبانر</p>
+            <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+              <i class="ti ti-upload"></i> Upload Image / رفع صورة
+              <input type="file" accept="image/*" style="display:none" onchange="addBannerImage(this)"/>
+            </label>
+            <div style="margin:1rem 0;font-size:12px;color:var(--muted)">— أو —</div>
+            <div style="display:flex;gap:.5rem;max-width:500px;margin:0 auto">
+              <input type="url" id="banner-url-input" placeholder="https://... (رابط صورة)" style="flex:1;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+              <button class="btn btn-dark btn-sm" onclick="addBannerByUrl()"><i class="ti ti-plus"></i> Add</button>
             </div>
           </div>
-          <button class="btn btn-green" style="margin-top:1.5rem" onclick="saveBannerText()"><i class="ti ti-check"></i> Save Text</button>
+
+          <!-- Current banner images list -->
+          <h4 style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Current Slides / الصور الحالية</h4>
+          <div id="banner-images-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem">
+            <div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">
+              لا توجد صور بعد — أضف صورة أعلاه
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:1rem"><i class="ti ti-info-circle"></i> اضغط على 🗑 لحذف صورة من السلايدر</p>
         </div>
       </div>
 
@@ -1503,101 +1495,162 @@ function loadSEOSettings() {
   }
 }
 
-// ═══ BANNER FUNCTIONS ═══
-function uploadBannerImage(input) {
+// ═══ BANNER / SLIDER FUNCTIONS ═══
+let bannerImages = []; // array of base64/url strings
+let sliderIndex = 0;
+let sliderTimer = null;
+
+function loadBannerImages() {
+  try {
+    const stored = localStorage.getItem('ayo_banner_images');
+    if (stored) bannerImages = JSON.parse(stored);
+    else {
+      // backward compat: single image
+      const old = localStorage.getItem('ayo_banner');
+      if (old) { bannerImages = [old]; saveBannerImages(); }
+    }
+  } catch(e) { bannerImages = []; }
+  renderSlider();
+  renderDashBannerList();
+}
+
+function saveBannerImages() {
+  localStorage.setItem('ayo_banner_images', JSON.stringify(bannerImages));
+}
+
+function renderSlider() {
+  const slider = document.getElementById('hero-slider');
+  const dots = document.getElementById('hero-dots');
+  const prev = document.getElementById('hero-prev');
+  const next = document.getElementById('hero-next');
+  const placeholder = document.getElementById('hero-placeholder');
+  if (!slider) return;
+
+  // Remove old slides (keep placeholder)
+  slider.querySelectorAll('.hero-slide').forEach(el => el.remove());
+  dots.innerHTML = '';
+
+  if (!bannerImages.length) {
+    if (placeholder) placeholder.style.display = 'flex';
+    if (prev) prev.style.display = 'none';
+    if (next) next.style.display = 'none';
+    clearInterval(sliderTimer);
+    return;
+  }
+
+  if (placeholder) placeholder.style.display = 'none';
+  const showArrows = bannerImages.length > 1;
+  if (prev) prev.style.display = showArrows ? 'flex' : 'none';
+  if (next) next.style.display = showArrows ? 'flex' : 'none';
+
+  bannerImages.forEach((url, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide' + (i === sliderIndex ? ' active' : '');
+    slide.style.backgroundImage = `url(${url})`;
+    slider.insertBefore(slide, placeholder);
+
+    if (bannerImages.length > 1) {
+      const dot = document.createElement('button');
+      dot.className = 'hero-dot' + (i === sliderIndex ? ' active' : '');
+      dot.onclick = () => goToSlide(i);
+      dots.appendChild(dot);
+    }
+  });
+
+  clearInterval(sliderTimer);
+  if (bannerImages.length > 1) {
+    sliderTimer = setInterval(() => sliderNext(), 4500);
+  }
+}
+
+function goToSlide(n) {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  if (!slides.length) return;
+  slides[sliderIndex]?.classList.remove('active');
+  dots[sliderIndex]?.classList.remove('active');
+  sliderIndex = (n + slides.length) % slides.length;
+  slides[sliderIndex]?.classList.add('active');
+  dots[sliderIndex]?.classList.add('active');
+  clearInterval(sliderTimer);
+  if (slides.length > 1) sliderTimer = setInterval(() => sliderNext(), 4500);
+}
+function sliderNext() { goToSlide(sliderIndex + 1); }
+function sliderPrev() { goToSlide(sliderIndex - 1); }
+
+function addBannerImage(input) {
   const file = input.files[0];
-  if(!file) return;
+  if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const MAX = 1200;
+      const MAX = 1600;
       let w = img.width, h = img.height;
-      if(w > MAX){ h = h*(MAX/w); w = MAX; }
+      if (w > MAX) { h = h * (MAX/w); w = MAX; }
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      previewBannerUrl(dataUrl);
-      document.getElementById('banner-url').value = dataUrl;
+      bannerImages.push(dataUrl);
+      saveBannerImages();
+      sliderIndex = bannerImages.length - 1;
+      renderSlider();
+      renderDashBannerList();
+      showToast('تمت إضافة الصورة للبانر ✅');
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+  input.value = '';
 }
 
-function previewBannerUrl(url) {
-  const img = document.getElementById('banner-preview-img');
-  const icon = document.getElementById('banner-icon');
-  if(url && url.length > 5){ img.src=url; img.style.display='block'; if(icon) icon.style.display='none'; }
+function addBannerByUrl() {
+  const url = document.getElementById('banner-url-input').value.trim();
+  if (!url || url.length < 5) { showToast('أدخل رابط صورة صحيح'); return; }
+  bannerImages.push(url);
+  saveBannerImages();
+  sliderIndex = bannerImages.length - 1;
+  renderSlider();
+  renderDashBannerList();
+  document.getElementById('banner-url-input').value = '';
+  showToast('تمت إضافة الصورة ✅');
 }
 
-function saveBanner() {
-  const url = document.getElementById('banner-url').value;
-  if(!url){ showToast('Please upload or paste a banner URL'); return; }
-  localStorage.setItem('ayo_banner', url);
-  applyBannerImage(url);
-  showToast('Banner saved! تم حفظ البانر ✅');
+function removeBannerImage(i) {
+  bannerImages.splice(i, 1);
+  sliderIndex = 0;
+  saveBannerImages();
+  renderSlider();
+  renderDashBannerList();
+  showToast('تم حذف الصورة');
 }
 
-function applyBannerImage(url) {
-  const heroBg = document.getElementById('hero-bg');
-  if(heroBg && url) {
-    heroBg.style.backgroundImage = `url(${url})`;
-    heroBg.style.backgroundSize = 'cover';
-    heroBg.style.backgroundPosition = 'center';
+function renderDashBannerList() {
+  const list = document.getElementById('banner-images-list');
+  if (!list) return;
+  if (!bannerImages.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">لا توجد صور بعد — أضف صورة أعلاه</div>';
+    return;
   }
+  list.innerHTML = bannerImages.map((url, i) => `
+    <div style="position:relative;border:.5px solid rgba(30,42,24,.12);border-radius:4px;overflow:hidden">
+      <img src="${url}" style="width:100%;height:130px;object-fit:cover;display:block"/>
+      <div style="position:absolute;top:.4rem;right:.4rem;display:flex;gap:.3rem">
+        <span style="background:rgba(30,42,24,.6);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px">${i+1}</span>
+        <button onclick="removeBannerImage(${i})" style="background:rgba(220,50,50,.85);color:#fff;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center" title="حذف">✕</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-function saveBannerText() {
-  const data = {
-    title_en: document.getElementById('banner-title-en').value,
-    sub_en: document.getElementById('banner-sub-en').value,
-    title_ar: document.getElementById('banner-title-ar').value,
-    desc: document.getElementById('banner-desc').value
-  };
-  localStorage.setItem('ayo_banner_text', JSON.stringify(data));
-  applyBannerText(data);
-  showToast('Banner text saved! ✅');
-}
-
-function applyBannerText(d) {
-  if(!d) return;
-  const titleEl = document.getElementById('hero-title-el');
-  if(titleEl && d.title_en) titleEl.innerHTML = d.title_en + '<br><em id="hero-sub-el">' + (d.sub_en||'') + '</em>';
-  const arEl = document.getElementById('hero-ar-el');
-  if(arEl && d.title_ar) arEl.textContent = d.title_ar;
-  const descEl = document.getElementById('hero-desc-el');
-  if(descEl && d.desc) descEl.textContent = d.desc;
-}
-
-function loadBannerSettings() {
-  const banner = localStorage.getItem('ayo_banner');
-  if(banner) {
-    applyBannerImage(banner);
-    const pImg = document.getElementById('banner-preview-img');
-    if(pImg){ pImg.src=banner; pImg.style.display='block'; }
-    const urlInp = document.getElementById('banner-url');
-    if(urlInp) urlInp.value = banner;
-    const icon = document.getElementById('banner-icon');
-    if(icon) icon.style.display='none';
-  }
-  const bannerText = localStorage.getItem('ayo_banner_text');
-  if(bannerText) {
-    try {
-      const d = JSON.parse(bannerText);
-      applyBannerText(d);
-      if(document.getElementById('banner-title-en')) document.getElementById('banner-title-en').value = d.title_en||'';
-      if(document.getElementById('banner-sub-en')) document.getElementById('banner-sub-en').value = d.sub_en||'';
-      if(document.getElementById('banner-title-ar')) document.getElementById('banner-title-ar').value = d.title_ar||'';
-      if(document.getElementById('banner-desc')) document.getElementById('banner-desc').value = d.desc||'';
-    } catch(e){}
-  }
-}
+// legacy stubs so nothing breaks
+function uploadBannerImage(input){ addBannerImage(input); }
+function saveBanner(){}
 
 // ═══ INIT ═══
 loadSavedSettings();
-loadBannerSettings();
+loadBannerImages();
 loadSEOSettings();
 initStore();
 </script>
