@@ -221,6 +221,36 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .img-preview{width:100%;height:160px;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin-top:.5rem;overflow:hidden}
 .img-preview img{width:100%;height:100%;object-fit:cover}
 
+/* ═══ RICH TEXT EDITOR ═══ */
+.rte-wrap{border:.5px solid rgba(30,42,24,.2);background:#fff;transition:border-color .2s}
+.rte-wrap:focus-within{border-color:var(--green)}
+.rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 8px;border-bottom:.5px solid rgba(30,42,24,.12);background:var(--green-light)}
+.rte-btn{width:30px;height:28px;border:none;background:none;cursor:pointer;border-radius:3px;font-size:13px;color:var(--dark);display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Jost'}
+.rte-btn:hover{background:rgba(125,181,90,.25)}
+.rte-btn.active{background:var(--green);color:#fff}
+.rte-btn.wide{width:auto;padding:0 8px;font-size:11px;letter-spacing:.5px}
+.rte-sep{width:.5px;background:rgba(30,42,24,.15);margin:3px 4px;align-self:stretch}
+.rte-select{border:none;background:none;font-family:'Jost';font-size:12px;color:var(--dark);cursor:pointer;outline:none;padding:2px 4px;border-radius:3px}
+.rte-select:hover{background:rgba(125,181,90,.2)}
+.rte-body{min-height:150px;padding:12px 14px;outline:none;font-family:'Jost';font-size:13px;line-height:1.8;color:var(--dark)}
+.rte-body[dir=rtl]{text-align:right}
+.rte-body:empty:before{content:attr(data-placeholder);color:rgba(122,138,114,.5);pointer-events:none}
+.rte-body ul,.rte-body ol{padding-right:1.5rem;padding-left:1.5rem;margin:.4rem 0}
+.rte-body li{margin:.2rem 0}
+.rte-body h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin:.5rem 0 .3rem}
+.rte-body h4{font-size:15px;font-weight:600;margin:.4rem 0 .2rem}
+.rte-body a{color:var(--green);text-decoration:underline}
+.rte-body hr{border:none;border-top:.5px solid rgba(30,42,24,.15);margin:.8rem 0}
+/* Product detail description HTML output */
+.pd-desc-html{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;font-weight:300}
+.pd-desc-html ul,.pd-desc-html ol{padding-right:1.5rem;padding-left:1.5rem;margin:.5rem 0}
+.pd-desc-html li{margin:.3rem 0}
+.pd-desc-html strong,.pd-desc-html b{color:var(--dark);font-weight:600}
+.pd-desc-html h3{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--dark);margin:.6rem 0 .3rem}
+.pd-desc-html h4{font-size:14px;font-weight:600;color:var(--dark);margin:.4rem 0 .2rem}
+.pd-desc-html hr{border:none;border-top:.5px solid rgba(30,42,24,.12);margin:.8rem 0}
+.pd-desc-html[dir=rtl]{text-align:right}
+
 /* hero mobile text - hidden on desktop */
 .hero-mob-text{display:none}
 /* hero mobile slider - hidden on desktop */
@@ -945,8 +975,60 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <option value="sale">Sale</option>
         </select>
       </div>
-      <div class="form-group full"><label>Description (English)</label><textarea id="p-desc" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical" placeholder="Product description..."></textarea></div>
-      <div class="form-group full"><label>الوصف (عربي)</label><textarea id="p-desc-ar" rows="3" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical;direction:rtl" placeholder="وصف المنتج..."></textarea></div>
+      <div class="form-group full">
+        <label>Description (English)</label>
+        <div class="rte-wrap" id="rte-en-wrap">
+          <div class="rte-toolbar">
+            <select class="rte-select" onchange="rteFormat('formatBlock',this.value,this);this.value='p'">
+              <option value="p">Paragraph</option>
+              <option value="h3">Heading</option>
+              <option value="h4">Sub-heading</option>
+            </select>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="Bold" onclick="rteFormat('bold')"><b>B</b></button>
+            <button type="button" class="rte-btn" title="Italic" onclick="rteFormat('italic')"><i>I</i></button>
+            <button type="button" class="rte-btn" title="Underline" onclick="rteFormat('underline')"><u>U</u></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="Bullet List" onclick="rteFormat('insertUnorderedList')"><i class="ti ti-list"></i></button>
+            <button type="button" class="rte-btn" title="Numbered List" onclick="rteFormat('insertOrderedList')"><i class="ti ti-list-numbers"></i></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="Align Left" onclick="rteFormat('justifyLeft')"><i class="ti ti-align-left"></i></button>
+            <button type="button" class="rte-btn" title="Align Center" onclick="rteFormat('justifyCenter')"><i class="ti ti-align-center"></i></button>
+            <button type="button" class="rte-btn" title="Align Right" onclick="rteFormat('justifyRight')"><i class="ti ti-align-right"></i></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="Horizontal Line" onclick="rteFormat('insertHorizontalRule')"><i class="ti ti-minus"></i></button>
+            <button type="button" class="rte-btn" title="Clear Formatting" onclick="rteFormat('removeFormat')"><i class="ti ti-clear-formatting"></i></button>
+          </div>
+          <div class="rte-body" id="p-desc" contenteditable="true" data-placeholder="Product description..."></div>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>الوصف (عربي)</label>
+        <div class="rte-wrap" id="rte-ar-wrap">
+          <div class="rte-toolbar">
+            <select class="rte-select" onchange="rteFormat('formatBlock',this.value,this);this.value='p'">
+              <option value="p">فقرة</option>
+              <option value="h3">عنوان</option>
+              <option value="h4">عنوان فرعي</option>
+            </select>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="Bold" onclick="rteFormat('bold')"><b>B</b></button>
+            <button type="button" class="rte-btn" title="Italic" onclick="rteFormat('italic')"><i>I</i></button>
+            <button type="button" class="rte-btn" title="Underline" onclick="rteFormat('underline')"><u>U</u></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="قائمة نقطية" onclick="rteFormat('insertUnorderedList')"><i class="ti ti-list"></i></button>
+            <button type="button" class="rte-btn" title="قائمة مرقمة" onclick="rteFormat('insertOrderedList')"><i class="ti ti-list-numbers"></i></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="يسار" onclick="rteFormat('justifyLeft')"><i class="ti ti-align-left"></i></button>
+            <button type="button" class="rte-btn" title="وسط" onclick="rteFormat('justifyCenter')"><i class="ti ti-align-center"></i></button>
+            <button type="button" class="rte-btn" title="يمين" onclick="rteFormat('justifyRight')"><i class="ti ti-align-right"></i></button>
+            <div class="rte-sep"></div>
+            <button type="button" class="rte-btn" title="خط فاصل" onclick="rteFormat('insertHorizontalRule')"><i class="ti ti-minus"></i></button>
+            <button type="button" class="rte-btn" title="مسح التنسيق" onclick="rteFormat('removeFormat')"><i class="ti ti-clear-formatting"></i></button>
+          </div>
+          <div class="rte-body" id="p-desc-ar" contenteditable="true" dir="rtl" data-placeholder="وصف المنتج..."></div>
+        </div>
+      </div>
       <div class="form-group full"><label>Upload Product Image / رفع صورة المنتج</label>
         <label class="btn btn-outline btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-bottom:.8rem">
           <i class="ti ti-upload"></i> Choose Image File
@@ -1093,8 +1175,8 @@ function showProduct(p) {
       <p class="pd-title-ar">${p.name_ar||''}</p>
       <div class="stars" style="font-size:16px;margin-bottom:1rem">★★★★★</div>
       <div class="pd-price">${p.old_price?`<span style="text-decoration:line-through;color:var(--muted);font-size:22px;margin-right:12px">EGP ${p.old_price}</span>`:''}EGP ${p.price}</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:1rem;font-weight:300">${p.description||''}</p>
-      <p style="font-size:13px;color:var(--muted);direction:rtl;line-height:1.9;margin-bottom:1.5rem;font-weight:300">${p.description_ar||''}</p>
+      <div class="pd-desc-html">${p.description||''}</div>
+      <div class="pd-desc-html" dir="rtl">${p.description_ar||''}</div>
       <div class="qty-wrap">
         <button class="qty-btn" onclick="changeQty(-1)">−</button>
         <span class="qty-num" id="pd-qty">1</span>
@@ -1300,8 +1382,8 @@ function openProductModal(p) {
   document.getElementById('p-old-price').value = p?.old_price||'';
   document.getElementById('p-category').value = p?.category||'oils';
   document.getElementById('p-badge').value = p?.badge||'';
-  document.getElementById('p-desc').value = p?.description||'';
-  document.getElementById('p-desc-ar').value = p?.description_ar||'';
+  document.getElementById('p-desc').innerHTML = p?.description||'';
+  document.getElementById('p-desc-ar').innerHTML = p?.description_ar||'';
   document.getElementById('p-image').value = p?.image_url||'';
   document.getElementById('p-color').value = p?.color||'#7DB55A';
   selectedColor = p?.color||'#7DB55A';
@@ -1319,8 +1401,8 @@ async function saveProduct() {
     old_price: parseFloat(document.getElementById('p-old-price').value)||null,
     category: document.getElementById('p-category').value,
     badge: document.getElementById('p-badge').value||null,
-    description: document.getElementById('p-desc').value,
-    description_ar: document.getElementById('p-desc-ar').value,
+    description: document.getElementById('p-desc').innerHTML,
+    description_ar: document.getElementById('p-desc-ar').innerHTML,
     image_url: document.getElementById('p-image').value||null,
     color: selectedColor,
     in_stock: true
@@ -2008,6 +2090,17 @@ async function loadMobBannerImage() {
   }
   renderMobSlider();
   renderDashMobBannerList();
+}
+
+// ═══ RICH TEXT EDITOR ═══
+function rteFormat(cmd, value, selectEl) {
+  // Find which RTE body is focused or default to en
+  const activeRte = document.activeElement?.classList.contains('rte-body')
+    ? document.activeElement
+    : document.getElementById('p-desc');
+  activeRte.focus();
+  document.execCommand(cmd, false, value || null);
+  if (selectEl) { selectEl.value = 'p'; }
 }
 
 // ═══ INIT ═══
