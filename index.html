@@ -1306,27 +1306,21 @@ function uploadProductImage(input) {
   reader.readAsDataURL(file);
 }
 
-function uploadLogoFile(input) {
+async function uploadLogoFile(input) {
   const file = input.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const MAX = 400;
-      let w = img.width, h = img.height;
-      if(w > MAX){ h = h*(MAX/w); w = MAX; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/png', 0.9);
-      previewLogoUrl(dataUrl);
-      document.getElementById('logo-url-input').value = dataUrl;
-      showToast('Logo ready! الشعار جاهز ✅');
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  showToast('جاري رفع الشعار... ⏳');
+  const fileName = 'logo/logo.' + file.name.split('.').pop();
+  const { error } = await sb.storage.from(BUCKET).upload(fileName, file, { upsert: true, contentType: file.type });
+  if (error) {
+    showToast('خطأ في رفع الشعار — ' + error.message);
+  } else {
+    const url = STORAGE_URL + fileName;
+    applyLogo(url);
+    previewLogoUrl(url);
+    document.getElementById('logo-url-input').value = url;
+    showToast('تم رفع الشعار ✅');
+  }
 }
 
 function previewLogoUrl(url) {
@@ -1580,27 +1574,47 @@ function loadSEOSettings() {
   }
 }
 
-// ═══ BANNER / SLIDER FUNCTIONS ═══
-let bannerImages = []; // array of base64/url strings
+// ═══ SUPABASE STORAGE CONFIG ═══
+const BUCKET = 'Ayo Delight';
+const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/`;
+
+// ═══ BANNER / SLIDER FUNCTIONS (Supabase Storage) ═══
+let bannerImages = []; // array of public URLs
 let sliderIndex = 0;
 let sliderTimer = null;
 
-function loadBannerImages() {
+async function loadBannerImages() {
   try {
-    const stored = localStorage.getItem('ayo_banner_images');
-    if (stored) bannerImages = JSON.parse(stored);
-    else {
-      // backward compat: single image
-      const old = localStorage.getItem('ayo_banner');
-      if (old) { bannerImages = [old]; saveBannerImages(); }
+    const { data, error } = await sb.storage.from(BUCKET).list('banners', { sortBy: { column: 'created_at', order: 'asc' } });
+    if (!error && data && data.length) {
+      bannerImages = data.filter(f => f.name !== '.emptyFolderPlaceholder').map(f => STORAGE_URL + 'banners/' + f.name);
+    } else {
+      // fallback to localStorage for old data
+      const stored = localStorage.getItem('ayo_banner_images');
+      if (stored) bannerImages = JSON.parse(stored);
     }
-  } catch(e) { bannerImages = []; }
+  } catch(e) {
+    const stored = localStorage.getItem('ayo_banner_images');
+    if (stored) try { bannerImages = JSON.parse(stored); } catch(e2) {}
+  }
   renderSlider();
   renderDashBannerList();
 }
 
-function saveBannerImages() {
-  localStorage.setItem('ayo_banner_images', JSON.stringify(bannerImages));
+async function loadLogoFromStorage() {
+  try {
+    const { data } = await sb.storage.from(BUCKET).list('logo');
+    if (data && data.length) {
+      const logoFile = data.find(f => f.name !== '.emptyFolderPlaceholder');
+      if (logoFile) {
+        const url = STORAGE_URL + 'logo/' + logoFile.name;
+        applyLogo(url);
+      }
+    }
+  } catch(e) {}
+  // also try localStorage fallback
+  const savedLogo = localStorage.getItem('ayo_logo');
+  if (savedLogo) applyLogo(savedLogo);
 }
 
 function renderSlider() {
@@ -1611,7 +1625,6 @@ function renderSlider() {
   const placeholder = document.getElementById('hero-placeholder');
   if (!slider) return;
 
-  // Remove old slides (keep placeholder)
   slider.querySelectorAll('.hero-slide').forEach(el => el.remove());
   dots.innerHTML = '';
 
@@ -1663,30 +1676,18 @@ function goToSlide(n) {
 function sliderNext() { goToSlide(sliderIndex + 1); }
 function sliderPrev() { goToSlide(sliderIndex - 1); }
 
-function addBannerImage(input) {
+async function addBannerImage(input) {
   const file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const MAX = 1600;
-      let w = img.width, h = img.height;
-      if (w > MAX) { h = h * (MAX/w); w = MAX; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      bannerImages.push(dataUrl);
-      saveBannerImages();
-      sliderIndex = bannerImages.length - 1;
-      renderSlider();
-      renderDashBannerList();
-      showToast('تمت إضافة الصورة للبانر ✅');
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+  showToast('جاري رفع الصورة... ⏳');
+  const fileName = 'banners/banner_' + Date.now() + '.' + file.name.split('.').pop();
+  const { error } = await sb.storage.from(BUCKET).upload(fileName, file, { upsert: true, contentType: file.type });
+  if (error) {
+    showToast('خطأ في الرفع — ' + error.message);
+  } else {
+    showToast('تمت إضافة الصورة للبانر ✅');
+    await loadBannerImages();
+  }
   input.value = '';
 }
 
@@ -1694,18 +1695,21 @@ function addBannerByUrl() {
   const url = document.getElementById('banner-url-input').value.trim();
   if (!url || url.length < 5) { showToast('أدخل رابط صورة صحيح'); return; }
   bannerImages.push(url);
-  saveBannerImages();
-  sliderIndex = bannerImages.length - 1;
   renderSlider();
   renderDashBannerList();
   document.getElementById('banner-url-input').value = '';
   showToast('تمت إضافة الصورة ✅');
 }
 
-function removeBannerImage(i) {
+async function removeBannerImage(i) {
+  const url = bannerImages[i];
+  // if it's a supabase storage URL, delete from storage
+  if (url.includes(SUPABASE_URL)) {
+    const path = url.split('/public/' + BUCKET + '/')[1];
+    await sb.storage.from(BUCKET).remove([path]);
+  }
   bannerImages.splice(i, 1);
   sliderIndex = 0;
-  saveBannerImages();
   renderSlider();
   renderDashBannerList();
   showToast('تم حذف الصورة');
@@ -1729,12 +1733,13 @@ function renderDashBannerList() {
   `).join('');
 }
 
-// legacy stubs so nothing breaks
+// legacy stubs
 function uploadBannerImage(input){ addBannerImage(input); }
 function saveBanner(){}
 
 // ═══ INIT ═══
 loadSavedSettings();
+loadLogoFromStorage();
 loadBannerImages();
 loadSEOSettings();
 initStore();
