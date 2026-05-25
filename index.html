@@ -223,8 +223,8 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 
 /* hero mobile text - hidden on desktop */
 .hero-mob-text{display:none}
-/* hero mobile image - hidden on desktop */
-#hero-mob-img-wrap{display:none!important}
+/* hero mobile slider - hidden on desktop */
+#hero-mob-slider-wrap{display:none!important}
 
 .mob-dash-topbar{display:none}
 .mob-dash-nav{display:none}
@@ -378,9 +378,12 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         </div>
       </div>
     </div>
-    <!-- Mobile-only dedicated banner image (replaces slider on small screens) -->
-    <div id="hero-mob-img-wrap" style="display:none;position:absolute;inset:0;z-index:2">
-      <img id="hero-mob-img" src="" style="width:100%;height:100%;object-fit:cover;display:block"/>
+    <!-- Mobile-only slider (replaces desktop slider on small screens) -->
+    <div id="hero-mob-slider-wrap" style="display:none;position:absolute;inset:0;z-index:2;overflow:hidden">
+      <div id="hero-mob-slides" style="display:flex;height:100%;transition:transform .45s ease"></div>
+      <button class="hero-arrow hero-arrow-left" onclick="mobSliderPrev()" style="display:block"><i class="ti ti-chevron-left"></i></button>
+      <button class="hero-arrow hero-arrow-right" onclick="mobSliderNext()" style="display:block"><i class="ti ti-chevron-right"></i></button>
+      <div class="hero-dots" id="hero-mob-dots"></div>
     </div>
     <button class="hero-arrow hero-arrow-left" id="hero-prev" onclick="sliderPrev()" style="display:none"><i class="ti ti-chevron-left"></i></button>
     <button class="hero-arrow hero-arrow-right" id="hero-next" onclick="sliderNext()" style="display:none"><i class="ti ti-chevron-right"></i></button>
@@ -708,37 +711,32 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <p style="font-size:11px;color:var(--muted);margin-top:1rem"><i class="ti ti-info-circle"></i> اضغط على 🗑 لحذف صورة من السلايدر</p>
         </div>
 
-        <!-- Mobile Banner IMAGE -->
+        <!-- Mobile Banner SLIDER -->
         <div class="dash-card" style="margin-bottom:1.5rem">
-          <h3 class="dash-card-title" style="margin-bottom:.5rem">📱 Mobile Banner Image / صورة الهاتف</h3>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:1.5rem">صورة مخصصة للموبايل فقط — توضع بدلاً من السلايدر على الشاشات الصغيرة. Recommended: 800×600px portrait or square.</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start">
-            <div style="border:.5px dashed rgba(30,42,24,.25);padding:1.5rem;border-radius:4px;text-align:center;background:var(--green-light)">
-              <i class="ti ti-device-mobile" style="font-size:36px;color:var(--green);margin-bottom:.8rem;display:block"></i>
-              <p style="font-size:13px;margin-bottom:1rem;color:var(--dark)">رفع صورة الهاتف</p>
-              <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px">
-                <i class="ti ti-upload"></i> Upload / رفع
-                <input type="file" accept="image/*" style="display:none" onchange="uploadMobBannerImage(this)"/>
-              </label>
-              <div style="margin:.8rem 0;font-size:12px;color:var(--muted)">— أو —</div>
-              <div style="display:flex;flex-direction:column;gap:.5rem">
-                <input type="url" id="mob-banner-img-url" placeholder="https://... (رابط صورة)" style="width:100%;padding:9px 12px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:12px;outline:none;background:#fff"/>
-                <button class="btn btn-dark btn-sm" onclick="saveMobBannerImageUrl()"><i class="ti ti-check"></i> Apply URL</button>
-              </div>
-            </div>
-            <div>
-              <p style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem">Preview / معاينة</p>
-              <div id="mob-banner-img-preview-wrap" style="width:100%;max-width:200px;aspect-ratio:4/5;background:var(--green-light);border:.5px solid rgba(30,42,24,.12);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:4px">
-                <img id="mob-banner-img-preview" src="" style="width:100%;height:100%;object-fit:cover;display:none"/>
-                <div id="mob-banner-img-placeholder" style="text-align:center;color:var(--muted)">
-                  <i class="ti ti-photo" style="font-size:32px;display:block;margin-bottom:.5rem"></i>
-                  <span style="font-size:11px">لا توجد صورة</span>
-                </div>
-              </div>
-              <div id="mob-banner-img-status" style="margin-top:.8rem;font-size:12px;color:var(--muted)"></div>
-              <button id="mob-banner-img-remove-btn" class="btn btn-red btn-sm" style="margin-top:.8rem;display:none" onclick="removeMobBannerImage()"><i class="ti ti-trash"></i> Remove / حذف</button>
+          <h3 class="dash-card-title" style="margin-bottom:.5rem">📱 Mobile Banner Slider / سلايدر الهاتف</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1.5rem">صور مخصصة للموبايل — تعمل كسلايدر تلقائي على الشاشات الصغيرة. Recommended: 800×600px portrait or square.</p>
+
+          <div style="border:.5px dashed rgba(30,42,24,.25);padding:1.5rem;border-radius:4px;text-align:center;margin-bottom:1.5rem;background:var(--green-light)">
+            <i class="ti ti-device-mobile" style="font-size:36px;color:var(--green);margin-bottom:.8rem;display:block"></i>
+            <p style="font-size:13px;margin-bottom:1rem;color:var(--dark)">رفع صورة جديدة لسلايدر الهاتف</p>
+            <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+              <i class="ti ti-upload"></i> Upload Image / رفع صورة
+              <input type="file" accept="image/*" style="display:none" onchange="addMobBannerImage(this)"/>
+            </label>
+            <div style="margin:1rem 0;font-size:12px;color:var(--muted)">— أو —</div>
+            <div style="display:flex;gap:.5rem;max-width:500px;margin:0 auto">
+              <input type="url" id="mob-banner-url-input" placeholder="https://... (رابط صورة)" style="flex:1;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;background:#fff"/>
+              <button class="btn btn-dark btn-sm" onclick="addMobBannerByUrl()"><i class="ti ti-plus"></i> Add</button>
             </div>
           </div>
+
+          <h4 style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Current Mobile Slides / صور الهاتف الحالية</h4>
+          <div id="mob-banner-images-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem">
+            <div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">
+              لا توجد صور بعد — أضف صورة أعلاه
+            </div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:1rem"><i class="ti ti-info-circle"></i> اضغط على 🗑 لحذف صورة من سلايدر الهاتف</p>
         </div>
 
         <!-- Mobile Banner Text -->
@@ -1841,8 +1839,12 @@ function uploadBannerImage(input){ addBannerImage(input); }
 function saveBanner(){}
 
 
-// ═══ MOBILE BANNER IMAGE ═══
-async function uploadMobBannerImage(input) {
+// ═══ MOBILE BANNER SLIDER ═══
+let mobBannerImages = [];
+let mobSliderIndex = 0;
+let mobSliderTimer = null;
+
+async function addMobBannerImage(input) {
   const file = input.files[0];
   if (!file) return;
   showToast('جاري رفع صورة الهاتف... ⏳');
@@ -1851,82 +1853,128 @@ async function uploadMobBannerImage(input) {
   if (error) {
     showToast('خطأ في الرفع — ' + error.message);
   } else {
-    const url = STORAGE_URL + fileName;
-    applyMobBannerImage(url);
-    localStorage.setItem('ayo_mob_banner_img', url);
-    showToast('تم رفع صورة الهاتف ✅');
+    showToast('تمت إضافة صورة الهاتف ✅');
+    await loadMobBannerImage();
   }
   input.value = '';
 }
 
-function saveMobBannerImageUrl() {
-  const url = document.getElementById('mob-banner-img-url')?.value?.trim();
+function addMobBannerByUrl() {
+  const url = document.getElementById('mob-banner-url-input')?.value?.trim();
   if (!url || url.length < 5) { showToast('أدخل رابط صورة صحيح'); return; }
-  applyMobBannerImage(url);
-  localStorage.setItem('ayo_mob_banner_img', url);
-  showToast('تم حفظ صورة الهاتف ✅');
+  mobBannerImages.push(url);
+  renderMobSlider();
+  renderDashMobBannerList();
+  document.getElementById('mob-banner-url-input').value = '';
+  showToast('تمت إضافة الصورة ✅');
 }
 
-function applyMobBannerImage(url) {
-  const wrap = document.getElementById('hero-mob-img-wrap');
-  const img = document.getElementById('hero-mob-img');
-  const preview = document.getElementById('mob-banner-img-preview');
-  const placeholder = document.getElementById('mob-banner-img-placeholder');
-  const removeBtn = document.getElementById('mob-banner-img-remove-btn');
-  const status = document.getElementById('mob-banner-img-status');
-  if (img) { img.src = url; }
-  if (wrap) { wrap.classList.add('has-img'); }
-  if (preview) { preview.src = url; preview.style.display = 'block'; }
-  if (placeholder) placeholder.style.display = 'none';
-  if (removeBtn) removeBtn.style.display = 'inline-flex';
-  if (status) status.textContent = '✅ صورة الهاتف محفوظة';
-}
-
-async function removeMobBannerImage() {
-  const url = localStorage.getItem('ayo_mob_banner_img');
+async function removeMobBannerImage(i) {
+  const url = mobBannerImages[i];
   if (url && url.includes(SUPABASE_URL)) {
     const path = url.split('/public/' + BUCKET + '/')[1];
     await sb.storage.from(BUCKET).remove([path]);
   }
-  localStorage.removeItem('ayo_mob_banner_img');
-  const wrap = document.getElementById('hero-mob-img-wrap');
-  const img = document.getElementById('hero-mob-img');
-  const preview = document.getElementById('mob-banner-img-preview');
-  const placeholder = document.getElementById('mob-banner-img-placeholder');
-  const removeBtn = document.getElementById('mob-banner-img-remove-btn');
-  const status = document.getElementById('mob-banner-img-status');
-  if (wrap) wrap.classList.remove('has-img');
-  if (img) img.src = '';
-  if (preview) { preview.src = ''; preview.style.display = 'none'; }
-  if (placeholder) placeholder.style.display = 'block';
-  if (removeBtn) removeBtn.style.display = 'none';
-  if (status) status.textContent = '';
-  showToast('تم حذف صورة الهاتف');
+  mobBannerImages.splice(i, 1);
+  mobSliderIndex = 0;
+  renderMobSlider();
+  renderDashMobBannerList();
+  showToast('تم حذف الصورة');
+}
+
+function renderMobSlider() {
+  const wrap = document.getElementById('hero-mob-slider-wrap');
+  const slidesEl = document.getElementById('hero-mob-slides');
+  const dotsEl = document.getElementById('hero-mob-dots');
+  if (!wrap || !slidesEl) return;
+
+  clearInterval(mobSliderTimer);
+
+  if (!mobBannerImages.length) {
+    wrap.classList.remove('has-slides');
+    return;
+  }
+  wrap.classList.add('has-slides');
+
+  slidesEl.innerHTML = mobBannerImages.map(url =>
+    `<div style="min-width:100%;height:100%;flex-shrink:0;background:url('${url}') center/cover no-repeat"></div>`
+  ).join('');
+
+  if (dotsEl) {
+    dotsEl.innerHTML = mobBannerImages.map((_, i) =>
+      `<span class="dot${i===mobSliderIndex?' active':''}" onclick="goMobSlide(${i})"></span>`
+    ).join('');
+  }
+
+  goMobSlide(mobSliderIndex);
+
+  if (mobBannerImages.length > 1) {
+    mobSliderTimer = setInterval(() => {
+      mobSliderIndex = (mobSliderIndex + 1) % mobBannerImages.length;
+      goMobSlide(mobSliderIndex);
+    }, 4000);
+  }
+}
+
+function goMobSlide(n) {
+  mobSliderIndex = n;
+  const slidesEl = document.getElementById('hero-mob-slides');
+  const dotsEl = document.getElementById('hero-mob-dots');
+  if (slidesEl) slidesEl.style.transform = `translateX(-${n * 100}%)`;
+  if (dotsEl) {
+    dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === n));
+  }
+}
+
+function mobSliderPrev() {
+  if (!mobBannerImages.length) return;
+  mobSliderIndex = (mobSliderIndex - 1 + mobBannerImages.length) % mobBannerImages.length;
+  goMobSlide(mobSliderIndex);
+}
+function mobSliderNext() {
+  if (!mobBannerImages.length) return;
+  mobSliderIndex = (mobSliderIndex + 1) % mobBannerImages.length;
+  goMobSlide(mobSliderIndex);
+}
+
+function renderDashMobBannerList() {
+  const list = document.getElementById('mob-banner-images-list');
+  if (!list) return;
+  if (!mobBannerImages.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">لا توجد صور بعد — أضف صورة أعلاه</div>';
+    return;
+  }
+  list.innerHTML = mobBannerImages.map((url, i) => `
+    <div style="position:relative;border:.5px solid rgba(30,42,24,.12);border-radius:4px;overflow:hidden">
+      <img src="${url}" style="width:100%;height:130px;object-fit:cover;display:block"/>
+      <div style="position:absolute;top:.4rem;right:.4rem;display:flex;gap:.3rem">
+        <span style="background:rgba(30,42,24,.6);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px">${i+1}</span>
+        <button onclick="removeMobBannerImage(${i})" style="background:rgba(220,50,50,.85);color:#fff;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center" title="حذف">✕</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 async function loadMobBannerImage() {
-  // First try Supabase Storage
+  mobBannerImages = [];
   try {
-    const { data } = await sb.storage.from(BUCKET).list('mob_banner', { sortBy: { column: 'created_at', order: 'desc' } });
-    if (data && data.length) {
-      const f = data.find(f => f.name !== '.emptyFolderPlaceholder');
-      if (f) {
-        const url = STORAGE_URL + 'mob_banner/' + f.name;
-        localStorage.setItem('ayo_mob_banner_img', url);
-        applyMobBannerImage(url);
-        const urlInput = document.getElementById('mob-banner-img-url');
-        if (urlInput) urlInput.value = url;
-        return;
-      }
+    const { data, error } = await sb.storage.from(BUCKET).list('mob_banner', { sortBy: { column: 'created_at', order: 'asc' } });
+    if (!error && data && data.length) {
+      const seen = new Set();
+      mobBannerImages = data
+        .filter(f => f.name !== '.emptyFolderPlaceholder')
+        .filter(f => { if (seen.has(f.name)) return false; seen.add(f.name); return true; })
+        .map(f => STORAGE_URL + 'mob_banner/' + f.name);
+    } else {
+      const stored = localStorage.getItem('ayo_mob_banner_imgs');
+      if (stored) mobBannerImages = JSON.parse(stored);
     }
-  } catch(e) {}
-  // Fallback: localStorage
-  const url = localStorage.getItem('ayo_mob_banner_img');
-  if (url) {
-    applyMobBannerImage(url);
-    const urlInput = document.getElementById('mob-banner-img-url');
-    if (urlInput) urlInput.value = url;
+  } catch(e) {
+    const stored = localStorage.getItem('ayo_mob_banner_imgs');
+    if (stored) try { mobBannerImages = JSON.parse(stored); } catch(e2) {}
   }
+  renderMobSlider();
+  renderDashMobBannerList();
 }
 
 // ═══ INIT ═══
