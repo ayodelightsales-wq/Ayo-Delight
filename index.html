@@ -221,7 +221,9 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .img-preview{width:100%;height:160px;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin-top:.5rem;overflow:hidden}
 .img-preview img{width:100%;height:100%;object-fit:cover}
 
-/* MOBILE DASH - hidden on desktop */
+/* hero mobile text - hidden on desktop */
+.hero-mob-text{display:none}
+
 .mob-dash-topbar{display:none}
 .mob-dash-nav{display:none}
 
@@ -239,11 +241,19 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .mob-menu.open{display:block}
 @media(max-width:768px){
   nav{padding:.8rem 1.2rem}.nav-links{display:none}.mob-menu-btn{display:block}
-  .hero{min-height:380px}
-  .hero-left{padding:2rem 1.5rem}
-  .hero-title{font-size:34px}
-  .hero{min-height:320px}
-  .hero-slide{background-size:150%;background-position:center center}
+
+  /* ═══ MOBILE HERO - Source Beauty Style ═══ */
+  .hero{min-height:auto;flex-direction:column;align-items:stretch;overflow:visible}
+  .hero-slider{position:relative;inset:auto;width:100%;height:380px;flex-shrink:0}
+  .hero-slide{background-size:cover;background-position:center}
+  .hero-arrow{top:50%;width:32px;height:32px;font-size:14px}
+  .hero-dots{bottom:.8rem}
+  /* Mobile banner text block below image */
+  .hero-mob-text{display:block;background:var(--green-light);padding:1.5rem 1.2rem;text-align:center}
+  .hero-mob-text h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin-bottom:.4rem;color:var(--dark)}
+  .hero-mob-text p{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:1.2rem;max-width:320px;margin-left:auto;margin-right:auto}
+  .hero-mob-text .btn{width:100%;justify-content:center;border-radius:30px}
+
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .section{padding:3rem 1.2rem}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
@@ -368,6 +378,12 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <button class="hero-arrow hero-arrow-left" id="hero-prev" onclick="sliderPrev()" style="display:none"><i class="ti ti-chevron-left"></i></button>
     <button class="hero-arrow hero-arrow-right" id="hero-next" onclick="sliderNext()" style="display:none"><i class="ti ti-chevron-right"></i></button>
     <div class="hero-dots" id="hero-dots"></div>
+  </div>
+  <!-- MOBILE TEXT BLOCK (Source Beauty style - shown only on mobile) -->
+  <div class="hero-mob-text" id="hero-mob-text">
+    <h2 id="hero-mob-title">Ayo Delight</h2>
+    <p id="hero-mob-desc">منتجات طبيعية مصنوعة بعناية — زيوت، كريمات، ومرطبات شفاه</p>
+    <button class="btn btn-dark" onclick="showPage('shop')">Shop Now — تسوقي الآن</button>
   </div>
   <div class="features-bar">
     <div class="features-grid">
@@ -683,6 +699,23 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
             </div>
           </div>
           <p style="font-size:11px;color:var(--muted);margin-top:1rem"><i class="ti ti-info-circle"></i> اضغط على 🗑 لحذف صورة من السلايدر</p>
+        </div>
+
+        <!-- Mobile Banner Text -->
+        <div class="dash-card">
+          <h3 class="dash-card-title" style="margin-bottom:.5rem">Mobile Text Block / نص الهاتف</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1.2rem">هذا النص يظهر تحت الصورة على الهاتف فقط (زي Source Beauty)</p>
+          <div style="display:grid;gap:1rem">
+            <div>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Title / العنوان</label>
+              <input type="text" id="mob-banner-title" placeholder="Ayo Delight" style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none"/>
+            </div>
+            <div>
+              <label style="display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem;color:var(--muted)">Description / الوصف</label>
+              <textarea id="mob-banner-desc" rows="2" placeholder="منتجات طبيعية..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Jost';font-size:13px;outline:none;resize:vertical"></textarea>
+            </div>
+            <button class="btn btn-green btn-sm" onclick="saveMobBannerText()"><i class="ti ti-check"></i> Save / حفظ</button>
+          </div>
         </div>
       </div>
 
@@ -1575,6 +1608,30 @@ function loadSEOSettings() {
   }
 }
 
+// ═══ MOBILE BANNER TEXT ═══
+function saveMobBannerText() {
+  const title = document.getElementById('mob-banner-title')?.value || '';
+  const desc = document.getElementById('mob-banner-desc')?.value || '';
+  localStorage.setItem('ayo_mob_banner', JSON.stringify({title, desc}));
+  applyMobBannerText(title, desc);
+  showToast('تم حفظ نص الهاتف ✅');
+}
+
+function applyMobBannerText(title, desc) {
+  const t = document.getElementById('hero-mob-title');
+  const d = document.getElementById('hero-mob-desc');
+  if(t && title) t.textContent = title;
+  if(d && desc) d.textContent = desc;
+}
+
+function loadMobBannerText() {
+  try {
+    const data = JSON.parse(localStorage.getItem('ayo_mob_banner') || '{}');
+    if(data.title) { applyMobBannerText(data.title, data.desc); const el=document.getElementById('mob-banner-title'); if(el) el.value=data.title; }
+    if(data.desc) { const el=document.getElementById('mob-banner-desc'); if(el) el.value=data.desc; }
+  } catch(e){}
+}
+
 // ═══ SUPABASE STORAGE CONFIG ═══
 const BUCKET = 'Ayo Delight';
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/${encodeURIComponent(BUCKET)}/`;
@@ -1742,6 +1799,7 @@ function saveBanner(){}
 loadSavedSettings();
 loadLogoFromStorage();
 loadBannerImages();
+loadMobBannerText();
 loadSEOSettings();
 initStore();
 </script>
