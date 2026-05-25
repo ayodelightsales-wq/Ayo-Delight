@@ -46,7 +46,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .hero{position:relative;width:100%;min-height:520px;overflow:hidden;display:flex;align-items:center}
 /* Slider container */
 .hero-slider{position:absolute;inset:0;z-index:0}
-.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .8s ease;background-color:var(--green-light)}
+.hero-slide{position:absolute;inset:0;background-size:cover;background-position:center center;opacity:0;transition:opacity .8s ease;background-color:var(--green-light)}
 .hero-slide.active{opacity:1}
 /* NO white overlay — image shows fully */
 .hero-left{display:none}
@@ -242,7 +242,8 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   .hero{min-height:380px}
   .hero-left{padding:2rem 1.5rem}
   .hero-title{font-size:34px}
-  .hero{min-height:260px}
+  .hero{min-height:320px}
+  .hero-slide{background-size:150%;background-position:center center}
   .features-grid{grid-template-columns:repeat(2,1fr)}
   .section{padding:3rem 1.2rem}
   .products-grid{grid-template-columns:repeat(2,1fr);gap:1rem}
