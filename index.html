@@ -1715,14 +1715,14 @@ async function submitReview() {
     photos: reviewPhotos,
     created_at: new Date().toISOString()
   };
-  // Always save to localStorage first (guaranteed)
-  const key = 'reviews_' + currentProductId;
-  const existing = JSON.parse(localStorage.getItem(key)||'[]');
-  existing.unshift(review);
-  localStorage.setItem(key, JSON.stringify(existing.slice(0,50)));
-  // Also try Supabase
-  try { await sb.from('reviews').insert([review]); } catch(e) {}
-  showToast('Review submitted! شكراً لرأيك ✅');
+  try {
+    const {error} = await sb.from('reviews').insert([review]);
+    if(error) throw error;
+    showToast('Review submitted! شكراً لرأيك ✅');
+  } catch(e) {
+    showToast('Error saving review. Try again.');
+    return;
+  }
   document.getElementById('review-name').value = '';
   document.getElementById('review-text').value = '';
   reviewPhotos = [];
@@ -1737,22 +1737,10 @@ async function loadProductReviews(productId) {
   if(!el) return;
   el.innerHTML = '<div class="loading"><i class="ti ti-loader"></i></div>';
   let reviews = [];
-  // Load from localStorage
-  const local = JSON.parse(localStorage.getItem('reviews_'+productId)||'[]');
-  // Try Supabase and merge
   try {
     const {data} = await sb.from('reviews').select('*').eq('product_id', productId).order('created_at', {ascending:false});
-    if(data && data.length) {
-      // Merge: supabase + local not already in supabase
-      const sbIds = new Set(data.map(r=>r.created_at));
-      const localOnly = local.filter(r=>!sbIds.has(r.created_at));
-      reviews = [...data, ...localOnly].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    } else {
-      reviews = local;
-    }
-  } catch(e) {
-    reviews = local;
-  }
+    if(data) reviews = data;
+  } catch(e) {}
   if(!reviews.length) {
     el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No reviews yet. Be the first! — لا توجد مراجعات بعد</p>';
     return;
