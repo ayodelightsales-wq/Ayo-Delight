@@ -144,8 +144,8 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .add-btn:hover{background:#fff;color:var(--dark)}
 .pname{font-size:13px;font-weight:400;margin-bottom:2px}
 .pname-ar{font-size:12px;color:var(--muted);direction:rtl;margin-bottom:6px}
-.pprice{font-family:'Cormorant Garamond',serif;font-size:18px}
-.pprice .old{text-decoration:line-through;color:var(--muted);font-size:14px;margin-right:6px}
+.pprice{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;letter-spacing:.5px}
+.pprice .old{text-decoration:line-through;color:var(--muted);font-size:13px;margin-right:6px;font-weight:400}
 .stars{color:var(--green);font-size:11px;margin-bottom:4px}
 .loading{text-align:center;padding:4rem;color:var(--muted);font-size:13px}
 .loading i{font-size:32px;display:block;margin-bottom:1rem;animation:spin 1s linear infinite}
@@ -163,7 +163,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .pd-img img{width:100%;height:100%;object-fit:cover}
 .pd-title{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;margin-bottom:.4rem}
 .pd-title-ar{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--muted);direction:rtl;margin-bottom:1.2rem}
-.pd-price{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--green-dark);margin-bottom:1.5rem}
+.pd-price{font-family:'Montserrat',sans-serif;font-size:30px;font-weight:700;color:var(--green-dark);margin-bottom:1.5rem;letter-spacing:-.5px}
 .qty-wrap{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
 .qty-btn{width:36px;height:36px;border:.5px solid rgba(30,42,24,.2);background:none;cursor:pointer;font-size:18px;font-family:'Montserrat';transition:all .2s}
 .qty-btn:hover{background:var(--green);color:#fff;border-color:var(--green)}
@@ -1713,17 +1713,14 @@ async function submitReview() {
     photos: reviewPhotos,
     created_at: new Date().toISOString()
   };
-  const {error} = await sb.from('reviews').insert([review]);
-  if(error) {
-    // Save locally if table doesn't exist yet
-    const key = 'reviews_' + currentProductId;
-    const existing = JSON.parse(localStorage.getItem(key)||'[]');
-    existing.unshift(review);
-    localStorage.setItem(key, JSON.stringify(existing.slice(0,20)));
-    showToast('Review saved locally! ✅');
-  } else {
-    showToast('Review submitted! شكراً لرأيك ✅');
-  }
+  // Always save to localStorage first (guaranteed)
+  const key = 'reviews_' + currentProductId;
+  const existing = JSON.parse(localStorage.getItem(key)||'[]');
+  existing.unshift(review);
+  localStorage.setItem(key, JSON.stringify(existing.slice(0,50)));
+  // Also try Supabase
+  try { await sb.from('reviews').insert([review]); } catch(e) {}
+  showToast('Review submitted! شكراً لرأيك ✅');
   document.getElementById('review-name').value = '';
   document.getElementById('review-text').value = '';
   reviewPhotos = [];
@@ -1736,15 +1733,23 @@ async function loadProductReviews(productId) {
   currentProductId = productId;
   const el = document.getElementById('reviews-list');
   if(!el) return;
+  el.innerHTML = '<div class="loading"><i class="ti ti-loader"></i></div>';
   let reviews = [];
-  // Try Supabase first
+  // Load from localStorage
+  const local = JSON.parse(localStorage.getItem('reviews_'+productId)||'[]');
+  // Try Supabase and merge
   try {
     const {data} = await sb.from('reviews').select('*').eq('product_id', productId).order('created_at', {ascending:false});
-    if(data && data.length) reviews = data;
-  } catch(e) {}
-  // Fallback to localStorage
-  if(!reviews.length) {
-    reviews = JSON.parse(localStorage.getItem('reviews_'+productId)||'[]');
+    if(data && data.length) {
+      // Merge: supabase + local not already in supabase
+      const sbIds = new Set(data.map(r=>r.created_at));
+      const localOnly = local.filter(r=>!sbIds.has(r.created_at));
+      reviews = [...data, ...localOnly].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    } else {
+      reviews = local;
+    }
+  } catch(e) {
+    reviews = local;
   }
   if(!reviews.length) {
     el.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No reviews yet. Be the first! — لا توجد مراجعات بعد</p>';
