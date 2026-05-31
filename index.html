@@ -637,7 +637,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         <h3 style="margin:2rem 0 1.2rem">Payment Method / طريقة الدفع</h3>
         <label class="payment-option active" onclick="selectPayment(this)"><input type="radio" name="payment" value="cod" checked/><i class="ti ti-cash" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Cash on Delivery / الدفع عند الاستلام</div><div style="font-size:11px;color:var(--muted)">ادفع عند استلام طلبك</div></div></label>
         <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="card"/><i class="ti ti-credit-card" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Credit / Debit Card — بطاقة بنكية</div><div style="font-size:11px;color:var(--muted)">Visa · Mastercard · Meeza — عبر Paymob</div></div></label>
-        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="vodafone"/><i class="ti ti-device-mobile" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Vodafone Cash / فودافون كاش</div><div style="font-size:11px;color:var(--muted)">ادفع من محفظتك — عبر Paymob</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="instapay"/><i class="ti ti-arrows-transfer-up" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">InstaPay / انستاباي</div><div style="font-size:11px;color:var(--muted)">تحويل فوري — كل البنوك والمحافظ</div></div></label>
         <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="whatsapp"/><i class="ti ti-brand-whatsapp" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">WhatsApp Order / طلب واتساب</div><div style="font-size:11px;color:var(--muted)">سنتواصل معك لتأكيد الطلب</div></div></label>
         <button class="btn btn-green" style="width:100%;justify-content:center;padding:16px;margin-top:1.5rem" onclick="placeOrder()">Place Order — تأكيد الطلب <i class="ti ti-check"></i></button>
         <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:1rem"><i class="ti ti-lock" style="vertical-align:middle"></i> Secure &amp; Encrypted</p>
@@ -1114,6 +1114,33 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   </div>
 </div>
 
+<!-- INSTAPAY MODAL -->
+<div id="instapay-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;padding:2.5rem;max-width:460px;width:100%;text-align:center;position:relative">
+    <div style="width:60px;height:60px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem">
+      <i class="ti ti-arrows-transfer-up" style="font-size:28px;color:var(--green)"></i>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:.4rem">أكمل الدفع عبر InstaPay</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1.5rem">تم تسجيل طلبك — حوّل المبلغ لإتمام العملية</p>
+    <div style="background:var(--green-light);padding:1.2rem;margin-bottom:1.5rem">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem">المبلغ المطلوب</p>
+      <p id="instapay-total" style="font-family:'Montserrat',sans-serif;font-size:28px;font-weight:700;color:var(--green-dark)">EGP 0</p>
+    </div>
+    <div style="border:.5px solid rgba(30,42,24,.15);padding:1.2rem;margin-bottom:1.5rem;text-align:right">
+      <p style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;text-align:center">بيانات التحويل</p>
+      <div style="display:flex;justify-content:space-between;margin-bottom:.5rem"><span style="font-size:12px;color:var(--muted)">رقم InstaPay</span><span style="font-size:14px;font-weight:600" id="instapay-number">01142422421</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--muted)">اسم الحساب</span><span style="font-size:13px">Ayo Delight</span></div>
+    </div>
+    <div style="background:#FFF8E7;padding:1rem;margin-bottom:1.5rem;text-align:right;border-right:3px solid #C4A882">
+      <p style="font-size:12px;color:#8B6914;line-height:1.8">⚠️ بعد التحويل، أرسل لنا صورة الإيصال على <strong>واتساب</strong> مع اسمك: <strong id="instapay-name"></strong></p>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="https://wa.me/201110310887" target="_blank" class="btn btn-green btn-sm"><i class="ti ti-brand-whatsapp"></i> أرسل الإيصال</a>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('instapay-modal').style.display='none';showPage('success')"><i class="ti ti-check"></i> تم التحويل</button>
+    </div>
+  </div>
+</div>
+
 <!-- ORDER DETAIL MODAL -->
 <div class="modal-overlay" id="order-modal">
   <div class="modal">
@@ -1334,13 +1361,14 @@ async function placeOrder() {
     const ok = await initiatePaymob(orderData, PAYMOB_INTEGRATION_CARD);
     if(!ok) return;
   }
-  if(payment === 'vodafone') {
-    if(!PAYMOB_API_KEY) {
-      showToast('فودافون كاش سيكون متاحاً قريباً عبر Paymob 🔜');
-      return;
-    }
-    const ok = await initiatePaymob(orderData, PAYMOB_INTEGRATION_WALLET);
-    if(!ok) return;
+  if(payment === 'instapay') {
+    await saveOrderDB(orderData);
+    cart=[]; updateCartUI();
+    // Show InstaPay instructions
+    document.getElementById('instapay-total').textContent = 'EGP ' + total;
+    document.getElementById('instapay-name').textContent = name;
+    document.getElementById('instapay-modal').style.display = 'flex';
+    return;
   }
   await saveOrderDB(orderData);
   cart=[]; updateCartUI(); showPage('success');
