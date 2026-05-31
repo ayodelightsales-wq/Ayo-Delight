@@ -635,10 +635,10 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <div class="form-group"><label>Country</label><select id="co-country"><option>Saudi Arabia</option><option>Egypt</option><option>UAE</option><option>Kuwait</option><option>Qatar</option><option>Bahrain</option></select></div>
         </div>
         <h3 style="margin:2rem 0 1.2rem">Payment Method / طريقة الدفع</h3>
-        <label class="payment-option active" onclick="selectPayment(this)"><input type="radio" name="payment" value="bank" checked/><i class="ti ti-building-bank" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Bank Transfer / تحويل بنكي</div><div style="font-size:11px;color:var(--muted)">Al Rajhi / Alinma</div></div></label>
-        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="whatsapp"/><i class="ti ti-brand-whatsapp" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">WhatsApp Order</div><div style="font-size:11px;color:var(--muted)">Confirm via WhatsApp</div></div></label>
-        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="card"/><i class="ti ti-credit-card" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Credit / Debit Card</div><div style="font-size:11px;color:var(--muted)">Visa / Mastercard / Mada</div></div></label>
-        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="cod"/><i class="ti ti-cash" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Cash on Delivery</div><div style="font-size:11px;color:var(--muted)">Pay when you receive</div></div></label>
+        <label class="payment-option active" onclick="selectPayment(this)"><input type="radio" name="payment" value="cod" checked/><i class="ti ti-cash" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Cash on Delivery / الدفع عند الاستلام</div><div style="font-size:11px;color:var(--muted)">ادفع عند استلام طلبك</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="card"/><i class="ti ti-credit-card" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Credit / Debit Card — بطاقة بنكية</div><div style="font-size:11px;color:var(--muted)">Visa · Mastercard · Meeza — عبر Paymob</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="vodafone"/><i class="ti ti-device-mobile" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">Vodafone Cash / فودافون كاش</div><div style="font-size:11px;color:var(--muted)">ادفع من محفظتك — عبر Paymob</div></div></label>
+        <label class="payment-option" onclick="selectPayment(this)"><input type="radio" name="payment" value="whatsapp"/><i class="ti ti-brand-whatsapp" style="font-size:20px;color:var(--green)"></i><div><div style="font-size:13px">WhatsApp Order / طلب واتساب</div><div style="font-size:11px;color:var(--muted)">سنتواصل معك لتأكيد الطلب</div></div></label>
         <button class="btn btn-green" style="width:100%;justify-content:center;padding:16px;margin-top:1.5rem" onclick="placeOrder()">Place Order — تأكيد الطلب <i class="ti ti-check"></i></button>
         <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:1rem"><i class="ti ti-lock" style="vertical-align:middle"></i> Secure &amp; Encrypted</p>
       </div>
@@ -1278,23 +1278,71 @@ function goCheckout() {
   document.getElementById('checkout-total').textContent = `EGP ${total+shipping}`;
   showPage('checkout');
 }
+// ═══ PAYMOB CONFIG — أضف بياناتك هنا عند التفعيل ═══
+const PAYMOB_API_KEY        = '';  // ← API Key من Paymob
+const PAYMOB_INTEGRATION_CARD   = '';  // ← Integration ID (بطاقة)
+const PAYMOB_INTEGRATION_WALLET = '';  // ← Integration ID (محفظة)
+const PAYMOB_IFRAME_ID      = '';  // ← iFrame ID
+
+async function initiatePaymob(orderData, intId) {
+  if(!PAYMOB_API_KEY){ showToast('Paymob غير مفعّل بعد — سيتم تفعيله قريباً'); return false; }
+  try {
+    // 1. Auth
+    const auth = await fetch('https://accept.paymob.com/api/auth/tokens',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({api_key:PAYMOB_API_KEY})});
+    const {token} = await auth.json();
+    // 2. Order
+    const ord = await fetch('https://accept.paymob.com/api/ecommerce/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({auth_token:token,delivery_needed:false,amount_cents:Math.round(orderData.total*100),currency:'EGP',items:[]})});
+    const {id:orderId} = await ord.json();
+    // 3. Payment key
+    const pk = await fetch('https://accept.paymob.com/api/acceptance/payment_keys',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({auth_token:token,amount_cents:Math.round(orderData.total*100),expiration:3600,order_id:orderId,billing_data:{first_name:orderData.customer_name.split(' ')[0]||'NA',last_name:orderData.customer_name.split(' ')[1]||'NA',email:orderData.customer_email||'NA',phone_number:orderData.customer_phone||'NA',apartment:'NA',floor:'NA',street:'NA',building:'NA',shipping_method:'NA',postal_code:'NA',city:orderData.city||'NA',country:'EGY',state:'NA'},currency:'EGP',integration_id:intId})});
+    const {token:payKey} = await pk.json();
+    // 4. Open iframe
+    window.open(`https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${payKey}`,'_blank');
+    return true;
+  } catch(e){ showToast('خطأ في بوابة الدفع، حاول مرة أخرى'); return false; }
+}
+
 async function placeOrder() {
   const name = (document.getElementById('co-fname').value+' '+document.getElementById('co-lname').value).trim();
-  if(!name){ showToast('Please enter your name'); return; }
-  const total = cart.reduce((s,i)=>s+i.price*i.qty,0) + (cart.reduce((s,i)=>s+i.price*i.qty,0)>=150?0:25);
-  const payment = document.querySelector('input[name="payment"]:checked')?.value || 'bank';
-  await saveOrderDB({
+  if(!name){ showToast('Please enter your name / أدخل اسمك'); return; }
+  const phone = document.getElementById('co-phone').value.trim();
+  if(!phone){ showToast('Please enter your phone / أدخل رقم هاتفك'); return; }
+  const address = document.getElementById('co-address').value.trim();
+  if(!address){ showToast('Please enter your address / أدخل عنوانك'); return; }
+  const subtotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const shipping = subtotal >= 150 ? 0 : 25;
+  const total = subtotal + shipping;
+  const payment = document.querySelector('input[name="payment"]:checked')?.value || 'cod';
+  const orderData = {
     customer_name: name,
     customer_email: document.getElementById('co-email').value,
-    customer_phone: document.getElementById('co-phone').value,
-    customer_address: document.getElementById('co-address').value,
+    customer_phone: phone,
+    customer_address: address,
     city: document.getElementById('co-city').value,
     country: document.getElementById('co-country').value,
     payment_method: payment,
     items: cart,
-    total: total,
+    total,
     status: 'new'
-  });
+  };
+  // Handle Paymob payments
+  if(payment === 'card') {
+    if(!PAYMOB_API_KEY) {
+      showToast('الدفع بالكارت سيكون متاحاً قريباً عبر Paymob 🔜');
+      return;
+    }
+    const ok = await initiatePaymob(orderData, PAYMOB_INTEGRATION_CARD);
+    if(!ok) return;
+  }
+  if(payment === 'vodafone') {
+    if(!PAYMOB_API_KEY) {
+      showToast('فودافون كاش سيكون متاحاً قريباً عبر Paymob 🔜');
+      return;
+    }
+    const ok = await initiatePaymob(orderData, PAYMOB_INTEGRATION_WALLET);
+    if(!ok) return;
+  }
+  await saveOrderDB(orderData);
   cart=[]; updateCartUI(); showPage('success');
 }
 
