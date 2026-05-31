@@ -1356,11 +1356,11 @@ function renderProductsTable(products) {
 function renderOrdersTable(orders, containerId) {
   const el = document.getElementById(containerId);
   if(!orders||!orders.length){ el.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:2rem">No orders yet.</p>'; return; }
-  el.innerHTML = `<div class="dash-table-wrap"><table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Details</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map(o=>`<tr><td>${o.id}</td><td style="white-space:nowrap">${o.customer_name||'-'}</td><td><a href="https://wa.me/${(o.customer_phone||'').replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);white-space:nowrap">${o.customer_phone||'-'}</a></td><td style="white-space:nowrap">EGP ${o.total||0}</td><td style="white-space:nowrap">${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td style="white-space:nowrap">${new Date(o.created_at).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="showOrderDetails(${JSON.stringify(JSON.stringify(o))})"><i class="ti ti-eye"></i></button></td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Montserrat'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`).join('')}</tbody></table></div>`;
+  el.innerHTML = `<div class="dash-table-wrap"><table class="dash-table"><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Details</th>${containerId==='orders-table'?'<th>Action</th>':''}</tr></thead><tbody>${orders.map((o,idx)=>{window['__o'+idx]=o;return `<tr><td>${o.id}</td><td style="white-space:nowrap">${o.customer_name||'-'}</td><td><a href="https://wa.me/${(o.customer_phone||'').replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--green);white-space:nowrap">${o.customer_phone||'-'}</a></td><td style="white-space:nowrap">EGP ${o.total||0}</td><td style="white-space:nowrap">${o.payment_method||'-'}</td><td><span class="status-badge status-${o.status==='new'?'new':o.status==='done'?'done':'processing'}">${o.status}</span></td><td style="white-space:nowrap">${new Date(o.created_at).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="showOrderDetails(window['__o${idx}'])"><i class="ti ti-eye"></i></button></td>${containerId==='orders-table'?`<td><select onchange="updateOrderStatus(${o.id},this.value)" style="padding:4px 8px;font-size:11px;border:.5px solid rgba(30,42,24,.2);background:#fff;font-family:'Montserrat'"><option value="new" ${o.status==='new'?'selected':''}>New</option><option value="processing" ${o.status==='processing'?'selected':''}>Processing</option><option value="done" ${o.status==='done'?'selected':''}>Done</option></select></td>`:''}</tr>`;}).join('')}</tbody></table></div>`;
 }
 
-function showOrderDetails(orderJson) {
-  const o = JSON.parse(orderJson);
+function showOrderDetails(o) {
+  if(typeof o === 'string') try { o = JSON.parse(o); } catch(e) {}
   let items = [];
   try {
     if(Array.isArray(o.items)) items = o.items;
@@ -1369,6 +1369,7 @@ function showOrderDetails(orderJson) {
   const waNum = (o.customer_phone||'').replace(/\D/g,'');
   const waFixed = waNum.startsWith('0') ? '2'+waNum.slice(1) : waNum;
   const modal = document.getElementById('order-modal');
+  if(!modal) return;
   const itemsHtml = items.length ? items.map(i=>`
     <div style="display:flex;align-items:center;gap:1rem;padding:.8rem 0;border-bottom:.5px solid rgba(30,42,24,.08)">
       ${i.image_url ? `<img src="${i.image_url}" style="width:50px;height:60px;object-fit:cover;background:var(--green-light)"/>` : `<div style="width:50px;height:60px;background:${i.color||'var(--green-light)'};opacity:.4;flex-shrink:0"></div>`}
@@ -1412,11 +1413,11 @@ function showOrderDetails(orderJson) {
     </div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       <a href="https://wa.me/${waFixed}?text=${encodeURIComponent('مرحبا ' + (o.customer_name||'') + '! طلبك من Ayo Delight رقم #' + o.id + ' تم تأكيده. الإجمالي: EGP ' + o.total)}" target="_blank" class="btn btn-green btn-sm"><i class="ti ti-brand-whatsapp"></i> Send WhatsApp</a>
-      <button class="btn btn-outline btn-sm" onclick="document.getElementById('order-modal').classList.remove('open')"><i class="ti ti-x"></i> Close</button>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('order-modal').style.display='none'"><i class="ti ti-x"></i> Close</button>
     </div>
   `;
   document.getElementById('order-modal-title').textContent = 'Order #' + o.id + ' — ' + (o.customer_name||'');
-  modal.classList.add('open');
+  modal.style.display = 'flex';
 }
 function showDashSection(name, el) {
   document.querySelectorAll('.dash-section').forEach(s=>s.classList.remove('active'));
