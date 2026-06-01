@@ -273,7 +273,30 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .img-preview{width:100%;height:160px;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin-top:.5rem;overflow:hidden}
 .img-preview img{width:100%;height:100%;object-fit:cover}
 
-/* ═══ RICH TEXT EDITOR ═══ */
+/* ═══ REVIEWS SLIDER ═══ */
+.rv-section{padding:4rem 2.5rem;background:#fff;overflow:hidden}
+.rv-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
+.rv-track-wrap{position:relative;overflow:hidden}
+.rv-track{display:flex;gap:1rem;transition:transform .5s cubic-bezier(.4,0,.2,1);will-change:transform}
+.rv-slide{flex:0 0 calc(33.333% - .67rem);min-width:0;position:relative;overflow:hidden;aspect-ratio:4/5;cursor:pointer}
+.rv-slide img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.rv-slide:hover img{transform:scale(1.04)}
+.rv-dots{display:flex;justify-content:center;gap:.5rem;margin-top:1.5rem}
+.rv-dot{width:6px;height:6px;border-radius:50%;background:rgba(30,42,24,.15);border:none;cursor:pointer;padding:0;transition:all .3s}
+.rv-dot.active{background:var(--green);width:20px;border-radius:3px}
+.rv-arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:all .2s}
+.rv-arrow:hover{background:var(--green);color:#fff}
+.rv-arrow.prev{left:10px}
+.rv-arrow.next{right:10px}
+/* Lightbox */
+.rv-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:none;align-items:center;justify-content:center}
+.rv-lightbox.open{display:flex}
+.rv-lightbox img{max-width:90vw;max-height:90vh;object-fit:contain}
+.rv-lightbox-close{position:absolute;top:1rem;right:1rem;color:#fff;font-size:28px;cursor:pointer;background:none;border:none;line-height:1}
+@media(max-width:768px){
+  .rv-section{padding:3rem 1.2rem}
+  .rv-slide{flex:0 0 calc(50% - .5rem)}
+}
 .rte-wrap{border:.5px solid rgba(30,42,24,.2);background:#fff;transition:border-color .2s}
 .rte-wrap:focus-within{border-color:var(--green)}
 .rte-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:6px 8px;border-bottom:.5px solid rgba(30,42,24,.12);background:var(--green-light)}
@@ -487,6 +510,25 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div class="feat"><i class="ti ti-shield-check"></i><div class="feat-title">Certified Safe</div><div class="feat-ar">آمن ومعتمد</div></div>
     </div>
   </div>
+  <!-- ══ REVIEWS PHOTO SLIDER ══ -->
+  <div class="rv-section" id="rv-section" style="display:none">
+    <div class="rv-head">
+      <div>
+        <p class="sec-tag" id="rv-tag-en" data-lang="en">Customer Reviews</p>
+        <p class="sec-tag" id="rv-tag-ar" data-lang="ar" style="display:none">آراء العملاء</p>
+        <h2 class="sec-title" id="rv-title-en" data-lang="en">What Our Customers Say</h2>
+        <h2 class="sec-title" id="rv-title-ar" data-lang="ar" style="display:none">ماذا يقول عملاؤنا</h2>
+      </div>
+    </div>
+    <div class="rv-track-wrap">
+      <button class="rv-arrow prev" onclick="rvMove(-1)"><i class="ti ti-chevron-left"></i></button>
+      <div class="rv-track" id="rv-track"></div>
+      <button class="rv-arrow next" onclick="rvMove(1)"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="rv-dots" id="rv-dots"></div>
+  </div>
+
+  <!-- BEST SELLERS -->
   <div class="section">
     <div class="sec-head">
       <p class="sec-tag">Featured Collection</p>
@@ -720,6 +762,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div class="dash-nav-item" onclick="showDashSection('products',this)"><i class="ti ti-package"></i> Products / المنتجات</div>
       <div class="dash-nav-item" onclick="showDashSection('orders',this)"><i class="ti ti-shopping-cart"></i> Orders / الطلبات</div>
       <div class="dash-nav-item" onclick="showDashSection('home-edit',this)"><i class="ti ti-photo"></i> Home Banner / البانر</div>
+      <div class="dash-nav-item" onclick="showDashSection('reviews-slider',this)"><i class="ti ti-message-star"></i> Reviews Slider / سلايدر الآراء</div>
       <div class="dash-nav-item" onclick="showDashSection('about-edit',this)"><i class="ti ti-file-text"></i> About Page / عن المتجر</div>
       <div class="dash-nav-item" onclick="showDashSection('settings',this)"><i class="ti ti-settings"></i> Settings / الإعدادات</div>
       <div style="position:absolute;bottom:2rem;width:100%">
@@ -843,6 +886,47 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
               <textarea id="mob-banner-desc" rows="2" placeholder="منتجات طبيعية..." style="width:100%;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Montserrat';font-size:13px;outline:none;resize:vertical"></textarea>
             </div>
             <button class="btn btn-green btn-sm" onclick="saveMobBannerText()"><i class="ti ti-check"></i> Save / حفظ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEWS SLIDER SECTION -->
+      <div id="dash-reviews-slider" class="dash-section">
+        <div class="dash-header"><h2 class="dash-title">Reviews Slider / سلايدر آراء العملاء</h2></div>
+        <div class="dash-card" style="margin-bottom:1.5rem">
+          <h3 class="dash-card-title" style="margin-bottom:.5rem">📸 صور آراء العملاء</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:1.5rem">ارفع صور من آراء العملاء (سكرين شوت من سوشيال ميديا) — ستظهر كسلايدر أمام قسم Best Sellers. الحجم المناسب: 600×800px</p>
+
+          <!-- Upload area -->
+          <div style="border:.5px dashed rgba(30,42,24,.25);padding:1.5rem;border-radius:4px;text-align:center;margin-bottom:1.5rem;background:var(--green-light)">
+            <i class="ti ti-message-star" style="font-size:36px;color:var(--green);margin-bottom:.8rem;display:block"></i>
+            <p style="font-size:13px;margin-bottom:1rem;color:var(--dark)">رفع صور آراء العملاء</p>
+            <div id="rv-pending-list" style="display:none;margin-bottom:1rem;text-align:left;background:#fff;border:.5px solid rgba(30,42,24,.12);border-radius:4px;padding:.8rem;max-height:160px;overflow-y:auto"></div>
+            <label class="btn btn-green btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+              <i class="ti ti-upload"></i> رفع صور
+              <input type="file" id="rv-file-input" accept="image/*" multiple style="display:none" onchange="queueRvImages(this)"/>
+            </label>
+            <button id="rv-save-btn" class="btn btn-dark btn-sm" style="display:none;margin-top:.8rem" onclick="saveRvImages()"><i class="ti ti-check"></i> حفظ الصور</button>
+            <div style="margin:1rem 0;font-size:12px;color:var(--muted)">— أو أضف رابط صورة —</div>
+            <div style="display:flex;gap:.5rem;max-width:500px;margin:0 auto">
+              <input type="url" id="rv-url-input" placeholder="https://... رابط صورة الرأي" style="flex:1;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Montserrat';font-size:13px;outline:none;background:#fff"/>
+              <button class="btn btn-dark btn-sm" onclick="addRvByUrl()"><i class="ti ti-plus"></i> Add</button>
+            </div>
+          </div>
+
+          <!-- Current slides -->
+          <h4 style="font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">الصور الحالية في السلايدر</h4>
+          <div id="rv-images-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem">
+            <div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">لا توجد صور بعد — أضف صورة أعلاه</div>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:1rem"><i class="ti ti-info-circle"></i> اضغط على 🗑 لحذف صورة</p>
+        </div>
+
+        <!-- Preview -->
+        <div class="dash-card">
+          <h3 class="dash-card-title" style="margin-bottom:1rem">معاينة السلايدر</h3>
+          <div id="rv-dash-preview" style="background:var(--green-light);padding:1.5rem;text-align:center;color:var(--muted);font-size:13px;border-radius:4px">
+            أضف صوراً لترى المعاينة هنا
           </div>
         </div>
       </div>
@@ -998,6 +1082,9 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <button class="mob-dash-nav-item" id="mobnav-home-edit" onclick="mobDashNav('home-edit',this)">
       <i class="ti ti-photo"></i>Banner
     </button>
+    <button class="mob-dash-nav-item" id="mobnav-reviews-slider" onclick="mobDashNav('reviews-slider',this)">
+      <i class="ti ti-message-star"></i>Reviews
+    </button>
     <button class="mob-dash-nav-item" id="mobnav-settings" onclick="mobDashNav('settings',this)">
       <i class="ti ti-settings"></i>Settings
     </button>
@@ -1139,6 +1226,12 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <button class="btn btn-outline btn-sm" onclick="document.getElementById('instapay-modal').style.display='none';showPage('success')"><i class="ti ti-check"></i> تم التحويل</button>
     </div>
   </div>
+</div>
+
+<!-- REVIEWS LIGHTBOX -->
+<div class="rv-lightbox" id="rv-lightbox" onclick="this.classList.remove('open')">
+  <button class="rv-lightbox-close" onclick="document.getElementById('rv-lightbox').classList.remove('open')"><i class="ti ti-x"></i></button>
+  <img id="rv-lightbox-img" src="" alt="review"/>
 </div>
 
 <!-- ORDER DETAIL MODAL -->
@@ -1398,7 +1491,7 @@ function mobDashNav(section, btn) {
   document.querySelectorAll('.mob-dash-nav-item').forEach(b => b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   // update top bar title
-  const labels = {overview:'Overview',products:'Products',orders:'Orders','home-edit':'Banner',settings:'Settings','about-edit':'About'};
+  const labels = {overview:'Overview',products:'Products',orders:'Orders','home-edit':'Banner','reviews-slider':'Reviews',settings:'Settings','about-edit':'About'};
   const titleEl = document.getElementById('mob-dash-section-title');
   if(titleEl) titleEl.textContent = labels[section] || section;
   // reuse existing desktop function
@@ -1500,6 +1593,7 @@ function showDashSection(name, el) {
   document.querySelectorAll('.dash-nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('dash-'+name).classList.add('active');
   if(el) el.classList.add('active');
+  if(name==='reviews-slider') { renderRvDashList(); renderRvDashPreview(); }
 }
 
 // ═══ PRODUCT MODAL ═══
@@ -2247,6 +2341,165 @@ function rteFormat(cmd, value, selectEl) {
   if (selectEl) { selectEl.value = 'p'; }
 }
 
+// ═══ REVIEWS SLIDER ═══
+let rvImages = [];
+let rvIndex = 0;
+let rvPending = [];
+let rvPerView = window.innerWidth <= 768 ? 2 : 3;
+
+async function loadRvImages() {
+  try {
+    const { data } = await sb.storage.from(BUCKET).list('reviews-slider', { sortBy: { column: 'created_at', order: 'asc' } });
+    if (data && data.length) {
+      rvImages = data.filter(f => f.name !== '.emptyFolderPlaceholder').map(f => STORAGE_URL + 'reviews-slider/' + encodeURIComponent(f.name));
+    } else {
+      const local = JSON.parse(localStorage.getItem('rv_images') || '[]');
+      rvImages = local;
+    }
+  } catch(e) {
+    rvImages = JSON.parse(localStorage.getItem('rv_images') || '[]');
+  }
+  renderRvSlider();
+  renderRvDashList();
+}
+
+function renderRvSlider() {
+  const section = document.getElementById('rv-section');
+  const track = document.getElementById('rv-track');
+  const dots = document.getElementById('rv-dots');
+  if (!section || !track) return;
+  if (!rvImages.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  rvPerView = window.innerWidth <= 768 ? 2 : 3;
+  track.innerHTML = rvImages.map((src, i) => `
+    <div class="rv-slide" onclick="rvOpenLightbox('${src}')">
+      <img src="${src}" alt="review ${i+1}" loading="lazy"/>
+    </div>`).join('');
+  // Dots
+  const pages = Math.ceil(rvImages.length / rvPerView);
+  dots.innerHTML = Array.from({length: pages}, (_, i) =>
+    `<button class="rv-dot ${i===0?'active':''}" onclick="rvGoTo(${i})"></button>`).join('');
+  rvGoTo(0);
+}
+
+function rvGoTo(page) {
+  rvIndex = page;
+  const track = document.getElementById('rv-track');
+  const dots = document.querySelectorAll('.rv-dot');
+  if (!track) return;
+  rvPerView = window.innerWidth <= 768 ? 2 : 3;
+  const slideW = track.parentElement.offsetWidth / rvPerView;
+  track.style.transform = `translateX(-${page * rvPerView * slideW}px)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === page));
+}
+
+function rvMove(dir) {
+  rvPerView = window.innerWidth <= 768 ? 2 : 3;
+  const pages = Math.ceil(rvImages.length / rvPerView);
+  rvIndex = (rvIndex + dir + pages) % pages;
+  rvGoTo(rvIndex);
+}
+
+function rvOpenLightbox(src) {
+  document.getElementById('rv-lightbox-img').src = src;
+  document.getElementById('rv-lightbox').classList.add('open');
+}
+
+// Auto-play
+setInterval(() => { if(rvImages.length > rvPerView) rvMove(1); }, 4000);
+window.addEventListener('resize', () => renderRvSlider());
+
+// ── Dashboard: queue & save ──
+function queueRvImages(input) {
+  rvPending = [...rvPending, ...Array.from(input.files)];
+  const list = document.getElementById('rv-pending-list');
+  const btn = document.getElementById('rv-save-btn');
+  if (!rvPending.length) return;
+  list.style.display = 'block';
+  btn.style.display = 'inline-flex';
+  list.innerHTML = rvPending.map((f,i) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;font-size:12px;border-bottom:.5px solid rgba(30,42,24,.06)">
+      <span>📷 ${f.name}</span>
+      <button onclick="rvPending.splice(${i},1);queueRvImages({files:[]})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px">✕</button>
+    </div>`).join('');
+  input.value = '';
+}
+
+async function saveRvImages() {
+  if (!rvPending.length) return;
+  const btn = document.getElementById('rv-save-btn');
+  btn.innerHTML = '<i class="ti ti-loader"></i> Uploading...';
+  btn.disabled = true;
+  for (const file of rvPending) {
+    const fileName = 'reviews-slider/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    try {
+      await sb.storage.from(BUCKET).upload(fileName, file, { upsert: true, contentType: file.type });
+      rvImages.push(STORAGE_URL + encodeURIComponent(fileName));
+    } catch(e) {
+      // fallback: store as base64 locally
+      const reader = new FileReader();
+      reader.onload = ev => {
+        rvImages.push(ev.target.result);
+        localStorage.setItem('rv_images', JSON.stringify(rvImages));
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  localStorage.setItem('rv_images', JSON.stringify(rvImages));
+  rvPending = [];
+  document.getElementById('rv-pending-list').style.display = 'none';
+  btn.style.display = 'none';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-check"></i> حفظ الصور';
+  showToast('تم رفع الصور ✅');
+  renderRvSlider();
+  renderRvDashList();
+  renderRvDashPreview();
+}
+
+function addRvByUrl() {
+  const url = document.getElementById('rv-url-input').value.trim();
+  if (!url) return;
+  rvImages.push(url);
+  localStorage.setItem('rv_images', JSON.stringify(rvImages));
+  document.getElementById('rv-url-input').value = '';
+  showToast('تمت إضافة الصورة ✅');
+  renderRvSlider();
+  renderRvDashList();
+  renderRvDashPreview();
+}
+
+function deleteRvImage(idx) {
+  rvImages.splice(idx, 1);
+  localStorage.setItem('rv_images', JSON.stringify(rvImages));
+  renderRvSlider();
+  renderRvDashList();
+  renderRvDashPreview();
+  showToast('تم حذف الصورة');
+}
+
+function renderRvDashList() {
+  const el = document.getElementById('rv-images-list');
+  if (!el) return;
+  if (!rvImages.length) {
+    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:12px;border:.5px dashed rgba(30,42,24,.15);grid-column:1/-1">لا توجد صور بعد — أضف صورة أعلاه</div>';
+    return;
+  }
+  el.innerHTML = rvImages.map((src, i) => `
+    <div style="position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--green-light)">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover"/>
+      <button onclick="deleteRvImage(${i})" style="position:absolute;top:6px;right:6px;width:28px;height:28px;background:rgba(220,50,50,.85);color:#fff;border:none;cursor:pointer;border-radius:2px;font-size:14px;display:flex;align-items:center;justify-content:center">🗑</button>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.4);color:#fff;font-size:10px;padding:4px 8px;text-align:center">${i+1} / ${rvImages.length}</div>
+    </div>`).join('');
+}
+
+function renderRvDashPreview() {
+  const el = document.getElementById('rv-dash-preview');
+  if (!el) return;
+  if (!rvImages.length) { el.innerHTML = 'أضف صوراً لترى المعاينة هنا'; return; }
+  el.innerHTML = `<div style="display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem">${rvImages.map(src=>`<img src="${src}" style="height:120px;width:90px;object-fit:cover;flex-shrink:0"/>`).join('')}</div><p style="font-size:11px;margin-top:.8rem;color:var(--muted)">السلايدر يحتوي على ${rvImages.length} صورة</p>`;
+}
+
 // ═══ INIT ═══
 loadSavedSettings();
 loadLogoFromStorage();
@@ -2254,6 +2507,7 @@ loadBannerImages();
 loadMobBannerText();
 loadMobBannerImage();
 loadSEOSettings();
+loadRvImages();
 initStore();
 // Apply default language (EN) on load
 setLang('en', document.querySelector('.lang-btn'));
