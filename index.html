@@ -275,7 +275,20 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 .img-preview{width:100%;height:160px;background:var(--green-light);display:flex;align-items:center;justify-content:center;margin-top:.5rem;overflow:hidden}
 .img-preview img{width:100%;height:100%;object-fit:cover}
 
-/* ═══ REVIEWS SLIDER ═══ */
+/* ═══ PRODUCT IMAGE SLIDER ═══ */
+.pd-slider{position:relative;overflow:hidden;background:var(--green-light)}
+.pd-slider-track{display:flex;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.pd-slider-track img{width:100%;flex-shrink:0;object-fit:cover;aspect-ratio:1}
+.pd-slider-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;background:rgba(255,255,255,.85);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:background .2s}
+.pd-slider-arrow:hover{background:#fff}
+.pd-slider-arrow.prev{left:8px}
+.pd-slider-arrow.next{right:8px}
+.pd-slider-dots{display:flex;justify-content:center;gap:.4rem;padding:.6rem 0;background:var(--green-light)}
+.pd-slider-dot{width:6px;height:6px;border-radius:50%;background:rgba(30,42,24,.2);border:none;cursor:pointer;padding:0;transition:all .2s}
+.pd-slider-dot.active{background:var(--green);width:18px;border-radius:3px}
+.pd-slider-thumb-wrap{display:flex;gap:.4rem;margin-top:.5rem;overflow-x:auto;padding-bottom:.3rem}
+.pd-slider-thumb{width:60px;height:60px;object-fit:cover;cursor:pointer;opacity:.5;transition:opacity .2s;flex-shrink:0;border:1.5px solid transparent}
+.pd-slider-thumb.active{opacity:1;border-color:var(--green)}
 .rv-section{padding:4rem 2.5rem;background:#fff;overflow:hidden}
 .rv-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
 .rv-track-wrap{position:relative;overflow:hidden}
@@ -1172,15 +1185,20 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
           <div class="rte-body" id="p-desc-ar" contenteditable="true" dir="rtl" data-placeholder="وصف المنتج..."></div>
         </div>
       </div>
-      <div class="form-group full"><label>Upload Product Image / رفع صورة المنتج</label>
+      <div class="form-group full">
+        <label>Product Images / صور المنتج <span style="font-size:11px;color:var(--muted)">(يمكن رفع أكثر من صورة)</span></label>
         <label class="btn btn-outline btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;margin-bottom:.8rem">
-          <i class="ti ti-upload"></i> Choose Image File
-          <input type="file" accept="image/*" style="display:none" onchange="uploadProductImage(this)"/>
+          <i class="ti ti-upload"></i> Choose Images
+          <input type="file" accept="image/*" multiple style="display:none" onchange="uploadProductImages(this)"/>
         </label>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:.5rem">Or paste image URL below:</p>
-      </div>
-      <div class="form-group full"><label>Image URL (رابط الصورة)</label><input type="url" id="p-image" placeholder="https://..." oninput="previewImage(this.value)"/>
-        <div class="img-preview" id="img-preview"><i class="ti ti-photo" style="font-size:32px;color:var(--muted)"></i></div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:.8rem">Or paste image URL and press Add:</p>
+        <div style="display:flex;gap:.5rem;margin-bottom:.8rem">
+          <input type="url" id="p-image-url-input" placeholder="https://..." style="flex:1;padding:10px 14px;border:.5px solid rgba(30,42,24,.2);font-family:'Montserrat';font-size:13px;outline:none"/>
+          <button type="button" class="btn btn-dark btn-sm" onclick="addProductImageByUrl()"><i class="ti ti-plus"></i> Add</button>
+        </div>
+        <!-- Images grid -->
+        <div id="p-images-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem;margin-top:.5rem"></div>
+        <input type="hidden" id="p-image" value=""/>
       </div>
       <div class="form-group full"><label>Card Color</label>
         <div class="color-swatches">
@@ -1292,8 +1310,9 @@ async function updateOrderStatus(id, status) {
 function renderCard(p, container) {
   const card = document.createElement('div');
   card.className = 'pcard';
-  const imgContent = p.image_url
-    ? `<img src="${p.image_url}" alt="${p.name}" loading="lazy"/>`
+  const imgSrc = (p.images && p.images[0]) || p.image_url || '';
+  const imgContent = imgSrc
+    ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy"/>`
     : `<svg viewBox="0 0 100 160" width="70"><rect x="18" y="10" width="64" height="132" rx="24" fill="${p.color||'#7DB55A'}" opacity=".85"/><rect x="27" y="48" width="46" height="55" rx="8" fill="rgba(255,255,255,.22)"/><text x="50" y="75" text-anchor="middle" font-size="7" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text><text x="50" y="90" text-anchor="middle" font-size="5.5" fill="rgba(255,255,255,.75)" font-family="sans-serif">${(p.name||'').toUpperCase().substring(0,14)}</text></svg>`;
   card.innerHTML = `
     <div class="pimg" style="background:${(p.color||'#7DB55A')}18">
@@ -1337,14 +1356,25 @@ function filterProducts(cat, btn) {
 }
 
 // ═══ PRODUCT DETAIL ═══
+let pdSliderIndex = 0;
 function showProduct(p) {
-  currentProduct = p; pdQty = 1;
+  currentProduct = p; pdQty = 1; pdSliderIndex = 0;
   const container = document.getElementById('product-detail-content');
-  const imgContent = p.image_url
-    ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover"/>`
-    : `<svg viewBox="0 0 200 280" width="160"><rect x="30" y="15" width="140" height="250" rx="40" fill="${p.color||'#7DB55A'}" opacity=".85"/><rect x="48" y="75" width="104" height="100" rx="12" fill="rgba(255,255,255,.22)"/><text x="100" y="120" text-anchor="middle" font-size="12" fill="white" font-family="serif" font-weight="600">AYO DELIGHT</text><text x="100" y="138" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.7)" font-family="sans-serif">${(p.name||'').toUpperCase().substring(0,14)}</text></svg>`;
+  // Parse images — support array or single string
+  let images = [];
+  if(p.images && Array.isArray(p.images) && p.images.length) images = p.images;
+  else if(p.image_url) images = [p.image_url];
+  const sliderHTML = images.length
+    ? `<div class="pd-slider">
+        ${images.length>1?`<button class="pd-slider-arrow prev" onclick="pdSlide(-1)"><i class="ti ti-chevron-left"></i></button>`:''}
+        <div class="pd-slider-track" id="pd-track">${images.map(src=>`<img src="${src}" alt="${p.name||''}"/>`).join('')}</div>
+        ${images.length>1?`<button class="pd-slider-arrow next" onclick="pdSlide(1)"><i class="ti ti-chevron-right"></i></button>`:''}
+      </div>
+      ${images.length>1?`<div class="pd-slider-dots" id="pd-dots">${images.map((_,i)=>`<button class="pd-slider-dot ${i===0?'active':''}" onclick="pdGoTo(${i})"></button>`).join('')}</div>`:''}
+      ${images.length>1?`<div class="pd-slider-thumb-wrap">${images.map((src,i)=>`<img src="${src}" class="pd-slider-thumb ${i===0?'active':''}" onclick="pdGoTo(${i})"/>`).join('')}</div>`:''}`
+    : `<div class="pd-slider" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${(p.color||'#7DB55A')}18"><svg viewBox="0 0 200 280" width="120"><rect x="30" y="15" width="140" height="250" rx="40" fill="${p.color||'#7DB55A'}" opacity=".85"/><text x="100" y="138" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.7)" font-family="sans-serif">${(p.name||'').toUpperCase().substring(0,14)}</text></svg></div>`;
   container.innerHTML = `
-    <div class="pd-img" style="background:${(p.color||'#7DB55A')}18">${imgContent}</div>
+    <div style="background:${(p.color||'#7DB55A')}10">${sliderHTML}</div>
     <div>
       <p class="sec-tag" style="text-align:left">${(p.category||'').toUpperCase()}</p>
       <h2 class="pd-title" data-lang="en" style="${currentLang==='ar'?'display:none':''}">${p.name||''}</h2>
@@ -1598,6 +1628,77 @@ function showDashSection(name, el) {
   if(name==='reviews-slider') { renderRvDashList(); renderRvDashPreview(); }
 }
 
+function pdGoTo(idx) {
+  pdSliderIndex = idx;
+  const track = document.getElementById('pd-track');
+  if(!track) return;
+  const w = track.parentElement.offsetWidth;
+  track.style.transform = `translateX(-${idx*w}px)`;
+  document.querySelectorAll('.pd-slider-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  document.querySelectorAll('.pd-slider-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+function pdSlide(dir) {
+  const imgs = document.querySelectorAll('#pd-track img');
+  pdGoTo((pdSliderIndex+dir+imgs.length)%imgs.length);
+}
+
+// ═══ PRODUCT IMAGES MANAGEMENT ═══
+let productImages = []; // array of URLs for current product
+
+function renderProductImagesGrid() {
+  const grid = document.getElementById('p-images-grid');
+  if(!grid) return;
+  if(!productImages.length) {
+    grid.innerHTML = '<p style="font-size:11px;color:var(--muted);padding:.5rem 0">لا توجد صور بعد</p>';
+    document.getElementById('p-image').value = '';
+    return;
+  }
+  grid.innerHTML = productImages.map((src,i)=>`
+    <div style="position:relative;aspect-ratio:1;overflow:hidden;background:var(--green-light)">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover"/>
+      ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--green);color:#fff;font-size:9px;padding:2px 6px">MAIN</div>':''}
+      <button onclick="removeProductImage(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(200,50,50,.85);color:#fff;border:none;cursor:pointer;border-radius:2px;font-size:11px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>`).join('');
+  document.getElementById('p-image').value = productImages[0]||'';
+}
+
+function removeProductImage(idx) {
+  productImages.splice(idx,1);
+  renderProductImagesGrid();
+}
+
+function addProductImageByUrl() {
+  const url = document.getElementById('p-image-url-input').value.trim();
+  if(!url) return;
+  productImages.push(url);
+  document.getElementById('p-image-url-input').value = '';
+  renderProductImagesGrid();
+}
+
+async function uploadProductImages(input) {
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  showToast('Uploading images...');
+  for(const file of files) {
+    const fileName = 'products/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    try {
+      const {error} = await sb.storage.from(BUCKET).upload(fileName, file, {upsert:true, contentType:file.type});
+      if(!error) productImages.push(STORAGE_URL + encodeURIComponent(fileName));
+      else throw error;
+    } catch(e) {
+      // fallback base64
+      await new Promise(res=>{
+        const r = new FileReader();
+        r.onload = ev=>{ productImages.push(ev.target.result); res(); };
+        r.readAsDataURL(file);
+      });
+    }
+  }
+  renderProductImagesGrid();
+  showToast('تم رفع الصور ✅');
+  input.value='';
+}
+
 // ═══ PRODUCT MODAL ═══
 function openProductModal(p) {
   selectedColor = '#7DB55A';
@@ -1611,6 +1712,11 @@ function openProductModal(p) {
   document.getElementById('p-badge').value = p?.badge||'';
   document.getElementById('p-desc').innerHTML = p?.description||'';
   document.getElementById('p-desc-ar').innerHTML = p?.description_ar||'';
+  // Load images
+  productImages = [];
+  if(p?.images && Array.isArray(p.images) && p.images.length) productImages = [...p.images];
+  else if(p?.image_url) productImages = [p.image_url];
+  renderProductImagesGrid();
   document.getElementById('p-image').value = p?.image_url||'';
   document.getElementById('p-color').value = p?.color||'#7DB55A';
   selectedColor = p?.color||'#7DB55A';
@@ -1630,7 +1736,8 @@ async function saveProduct() {
     badge: document.getElementById('p-badge').value||null,
     description: document.getElementById('p-desc').innerHTML,
     description_ar: document.getElementById('p-desc-ar').innerHTML,
-    image_url: document.getElementById('p-image').value||null,
+    image_url: productImages[0]||null,
+    images: productImages.length ? productImages : null,
     color: selectedColor,
     in_stock: true
   };
