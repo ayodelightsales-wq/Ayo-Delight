@@ -1720,11 +1720,11 @@ function openProductModal(p) {
   document.getElementById('p-image').value = p?.image_url||'';
   document.getElementById('p-color').value = p?.color||'#7DB55A';
   selectedColor = p?.color||'#7DB55A';
-  previewImage(p?.image_url||'');
   document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
-  document.getElementById('product-modal').classList.add('open');
+  document.querySelectorAll('.swatch').forEach(s=>{ if(s.style.background===selectedColor) s.classList.add('selected'); });
+  document.getElementById('product-modal').style.display = 'flex';
 }
-function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
+function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
 async function saveProduct() {
   const id = document.getElementById('edit-product-id').value;
   const product = {
