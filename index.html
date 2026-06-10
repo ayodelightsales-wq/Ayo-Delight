@@ -1399,7 +1399,9 @@ function showProduct(p) {
 
   // Load reviews for this product
   setTimeout(() => loadProductReviews(p.id), 100);
-  showPage('product');
+  showPage('product', true);
+  // write product hash so URL reflects the open product
+  history.replaceState({productId: p.id}, '', '#product-' + p.id);
 }
 function changeQty(d) { pdQty = Math.max(1, pdQty+d); const el = document.getElementById('pd-qty'); if(el) el.textContent = pdQty; }
 function addToCartFromDetail() { for(let i=0;i<pdQty;i++) addToCart(currentProduct,true); pdQty=1; const el=document.getElementById('pd-qty'); if(el) el.textContent=1; showToast(`Added: ${currentProduct.name}`); }
@@ -1500,7 +1502,7 @@ async function placeOrder() {
 }
 
 // ═══ PAGES ═══
-function showPage(name) {
+function showPage(name, skipHash) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   const isStore = ['home','shop','product','cart','checkout','success','about'].includes(name);
@@ -1514,6 +1516,13 @@ function showPage(name) {
   if(navEl) navEl.classList.add('active');
   if(name==='cart') renderCartPage();
   if(name==='shop') initStore();
+  // ── Update URL hash ──
+  if (!skipHash) {
+    const skipPages = ['dashboard','dash-login','cart','checkout','success'];
+    if (!skipPages.includes(name)) {
+      history.replaceState(null, '', name === 'home' ? '#' : '#' + name);
+    }
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -2620,6 +2629,30 @@ loadRvImages();
 initStore();
 // Apply default language (EN) on load
 setLang('en', document.querySelector('.lang-btn'));
+
+// ═══ HASH ROUTER ═══
+function handleHash() {
+  const hash = location.hash.replace('#', '');
+  if (!hash || hash === '') { return; } // stay on home
+  if (hash === 'shop') { showPage('shop', true); return; }
+  if (hash === 'about') { showPage('about', true); return; }
+  if (hash.startsWith('product-')) {
+    const id = hash.replace('product-', '');
+    // wait for products to load then open
+    const tryOpen = (attempts) => {
+      const p = allProducts.find(x => String(x.id) === String(id));
+      if (p) { showProduct(p); return; }
+      if (attempts > 0) setTimeout(() => tryOpen(attempts - 1), 300);
+    };
+    tryOpen(15);
+    return;
+  }
+}
+
+window.addEventListener('popstate', handleHash);
+// run on load after products are fetched
+window.addEventListener('load', () => setTimeout(handleHash, 600));
+
 </script>
 </body>
 </html>
