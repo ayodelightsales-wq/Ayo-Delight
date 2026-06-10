@@ -1954,7 +1954,16 @@ function setLang(lang, btn) {
   document.querySelectorAll('[data-lang]').forEach(el=>{
     el.style.display = el.dataset.lang===lang ? '' : 'none';
   });
-  if(typeof currentProduct !== 'undefined' && currentProduct) renderProductDetail(currentProduct);
+  if(typeof currentProduct !== 'undefined' && currentProduct) {
+    const titleEn = document.querySelector('.pd-title[data-lang="en"]');
+    const titleAr = document.querySelector('.pd-title-ar[data-lang="ar"]');
+    const descEn = document.querySelector('.pd-desc-html[data-lang="en"]');
+    const descAr = document.querySelector('.pd-desc-html[data-lang="ar"]');
+    if(titleEn) titleEn.style.display = lang==='ar' ? 'none' : '';
+    if(titleAr) titleAr.style.display = lang==='en' ? 'none' : '';
+    if(descEn) descEn.style.display = lang==='ar' ? 'none' : '';
+    if(descAr) descAr.style.display = lang==='en' ? 'none' : '';
+  }
 }
 function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
 function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
