@@ -1401,7 +1401,8 @@ function showProduct(p) {
   setTimeout(() => loadProductReviews(p.id), 100);
   showPage('product', true);
   // write product hash so URL reflects the open product
-  history.replaceState({productId: p.id}, '', '#product-' + p.id);
+  const slug = slugify(currentLang === 'ar' && p.name_ar ? p.name_ar : p.name);
+  history.replaceState({productId: p.id}, '', '#' + slug);
 }
 function changeQty(d) { pdQty = Math.max(1, pdQty+d); const el = document.getElementById('pd-qty'); if(el) el.textContent = pdQty; }
 function addToCartFromDetail() { for(let i=0;i<pdQty;i++) addToCart(currentProduct,true); pdQty=1; const el=document.getElementById('pd-qty'); if(el) el.textContent=1; showToast(`Added: ${currentProduct.name}`); }
@@ -1502,6 +1503,17 @@ async function placeOrder() {
 }
 
 // ═══ PAGES ═══
+
+// ── Slug helper ──
+function slugify(str) {
+  return (str || '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\u0600-\u06ff-]/g, '')
+    .replace(/-+/g, '-');
+}
+
 function showPage(name, skipHash) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
@@ -2636,17 +2648,14 @@ function handleHash() {
   if (!hash || hash === '') { return; } // stay on home
   if (hash === 'shop') { showPage('shop', true); return; }
   if (hash === 'about') { showPage('about', true); return; }
-  if (hash.startsWith('product-')) {
-    const id = hash.replace('product-', '');
-    // wait for products to load then open
-    const tryOpen = (attempts) => {
-      const p = allProducts.find(x => String(x.id) === String(id));
-      if (p) { showProduct(p); return; }
-      if (attempts > 0) setTimeout(() => tryOpen(attempts - 1), 300);
-    };
-    tryOpen(15);
-    return;
-  }
+  // match by slug (name or name_ar) or legacy id
+  const tryOpen = (attempts) => {
+    let p = allProducts.find(x => slugify(x.name) === hash || slugify(x.name_ar) === hash);
+    if (!p) p = allProducts.find(x => String(x.id) === hash.replace('product-',''));
+    if (p) { showProduct(p); return; }
+    if (attempts > 0) setTimeout(() => tryOpen(attempts - 1), 300);
+  };
+  if (hash && hash !== 'shop' && hash !== 'about') { tryOpen(15); return; }
 }
 
 window.addEventListener('popstate', handleHash);
