@@ -188,6 +188,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .search-result-name{font-size:13px;font-weight:600;color:var(--dark)}
 .search-result-price{font-size:12px;color:var(--green);margin-top:2px}
 .search-empty{text-align:center;color:var(--muted);font-size:13px;padding:1.5rem 0}
+/* NEWSLETTER */
+.nl-msg{margin-top:.85rem;font-size:13px;font-weight:600;padding:.55rem 1.1rem;border-radius:8px;display:none;text-align:center}
+.nl-msg.success{display:block;background:#d4edda;color:#2d6a3f}
+.nl-msg.error{display:block;background:#fce4e4;color:#a33}
+
 /* CART */
 .cart-inner{max-width:900px;margin:0 auto;padding:3rem}
 .cart-table{width:100%;border-collapse:collapse;margin-bottom:2rem}
@@ -577,9 +582,10 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <h2 class="nl-title">Join Our Family</h2>
     <p class="nl-sub">Get exclusive offers &amp; new arrivals — انضمي لعائلة Ayo Delight</p>
     <div class="nl-form">
-      <input class="nl-input" type="email" placeholder="Your email / بريدك الإلكتروني"/>
-      <button class="nl-btn">Subscribe</button>
+      <input class="nl-input" type="email" id="nl-email-input" placeholder="Your email / بريدك الإلكتروني"/>
+      <button class="nl-btn" onclick="subscribeNewsletter()">Subscribe</button>
     </div>
+    <div class="nl-msg" id="nl-msg"></div>
   </div>
   <footer>
     <div class="footer-grid">
@@ -1976,6 +1982,45 @@ function loadSavedSettings() {
 
 // ═══ UTILS ═══
 let currentLang = 'en';
+// ═══ NEWSLETTER ═══
+function subscribeNewsletter() {
+  const input = document.getElementById('nl-email-input');
+  const msg   = document.getElementById('nl-msg');
+  const email = input.value.trim();
+  const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  msg.className = 'nl-msg';
+  msg.style.display = 'none';
+
+  if (!email || !emailReg.test(email)) {
+    msg.className = 'nl-msg error';
+    msg.textContent = '⚠️ Please enter a valid email. / أدخل بريدًا إلكترونيًا صحيحًا';
+    return;
+  }
+
+  // Save to localStorage
+  let subscribers = JSON.parse(localStorage.getItem('ayo_subscribers') || '[]');
+  if (subscribers.includes(email)) {
+    msg.className = 'nl-msg error';
+    msg.textContent = '📧 You\'re already subscribed! / أنت مشترك بالفعل!';
+    return;
+  }
+  subscribers.push(email);
+  localStorage.setItem('ayo_subscribers', JSON.stringify(subscribers));
+
+  // Save in storeData if available
+  if (typeof storeData !== 'undefined') {
+    if (!storeData.subscribers) storeData.subscribers = [];
+    storeData.subscribers.push({ email, date: new Date().toISOString() });
+    if (typeof saveStore === 'function') saveStore();
+  }
+
+  input.value = '';
+  msg.className = 'nl-msg success';
+  msg.textContent = '🎉 Welcome to the family! / أهلًا بك في العائلة!';
+  setTimeout(() => { msg.className = 'nl-msg'; }, 5000);
+}
+
 // ═══ SEARCH ═══
 function openSearch() {
   document.getElementById('search-overlay').classList.add('open');
