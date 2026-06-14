@@ -1983,14 +1983,14 @@ function loadSavedSettings() {
 // ═══ UTILS ═══
 let currentLang = 'en';
 // ═══ NEWSLETTER ═══
-function subscribeNewsletter() {
+async function subscribeNewsletter() {
   const input = document.getElementById('nl-email-input');
   const msg   = document.getElementById('nl-msg');
+  const btn   = document.querySelector('.nl-btn');
   const email = input.value.trim();
   const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   msg.className = 'nl-msg';
-  msg.style.display = 'none';
 
   if (!email || !emailReg.test(email)) {
     msg.className = 'nl-msg error';
@@ -1998,27 +1998,34 @@ function subscribeNewsletter() {
     return;
   }
 
-  // Save to localStorage
-  let subscribers = JSON.parse(localStorage.getItem('ayo_subscribers') || '[]');
-  if (subscribers.includes(email)) {
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const { error } = await sb.from('subscribers').insert([{ email }]);
+
+    if (error) {
+      if (error.code === '23505') { // unique violation
+        msg.className = 'nl-msg error';
+        msg.textContent = '📧 Already subscribed! / أنت مشترك بالفعل!';
+      } else {
+        msg.className = 'nl-msg error';
+        msg.textContent = '❌ Something went wrong. Try again. / حدث خطأ، حاول مجدداً';
+        console.error(error);
+      }
+    } else {
+      input.value = '';
+      msg.className = 'nl-msg success';
+      msg.textContent = '🎉 Welcome to the family! / أهلًا بك في العائلة!';
+      setTimeout(() => { msg.className = 'nl-msg'; msg.textContent=''; }, 5000);
+    }
+  } catch(e) {
     msg.className = 'nl-msg error';
-    msg.textContent = '📧 You\'re already subscribed! / أنت مشترك بالفعل!';
-    return;
-  }
-  subscribers.push(email);
-  localStorage.setItem('ayo_subscribers', JSON.stringify(subscribers));
-
-  // Save in storeData if available
-  if (typeof storeData !== 'undefined') {
-    if (!storeData.subscribers) storeData.subscribers = [];
-    storeData.subscribers.push({ email, date: new Date().toISOString() });
-    if (typeof saveStore === 'function') saveStore();
+    msg.textContent = '❌ Connection error. / خطأ في الاتصال';
   }
 
-  input.value = '';
-  msg.className = 'nl-msg success';
-  msg.textContent = '🎉 Welcome to the family! / أهلًا بك في العائلة!';
-  setTimeout(() => { msg.className = 'nl-msg'; }, 5000);
+  btn.disabled = false;
+  btn.textContent = 'Subscribe';
 }
 
 // ═══ SEARCH ═══
