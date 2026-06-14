@@ -1400,7 +1400,7 @@ function showProduct(p) {
   if(p.images && Array.isArray(p.images) && p.images.length) images = p.images;
   else if(p.image_url) images = [p.image_url];
   const sliderHTML = images.length
-    ? `<div class="pd-slider">
+    ? `<div class="pd-slider" dir="ltr">
         ${images.length>1?`<button class="pd-slider-arrow prev" onclick="pdSlide(-1)"><i class="ti ti-chevron-left"></i></button>`:''}
         <div class="pd-slider-track" id="pd-track">${images.map(src=>`<img src="${src}" alt="${p.name||''}"/>`).join('')}</div>
         ${images.length>1?`<button class="pd-slider-arrow next" onclick="pdSlide(1)"><i class="ti ti-chevron-right"></i></button>`:''}
