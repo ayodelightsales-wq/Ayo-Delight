@@ -1382,7 +1382,7 @@ function renderCard(p, container) {
     <div class="pimg" style="background:${(p.color||'#7DB55A')}18">
       ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge==='new'?'New':'Sale'}</span>` : ''}
       ${imgContent}
-      <button class="wish-btn" onclick="event.stopPropagation();toggleWishlist(p.id,this)" title="Wishlist"><i class="ti ti-heart"></i></button>
+      <button class="wish-btn ${isWishlisted(p.id)?'wishlisted':''}" onclick="event.stopPropagation();toggleWishlist(${p.id},this)" title="Wishlist"><i class="ti ti-heart"></i></button>
       <div class="overlay"><button class="add-btn" onclick="event.stopPropagation();addToCart({id:${p.id},name:'${(p.name||'').replace(/'/g,"\\'")}',nameAr:'${(p.name_ar||'').replace(/'/g,"\\'")}',price:${p.price},color:'${p.color||'#7DB55A'}',image_url:'${p.image_url||''}'})">Add to Cart — أضف للسلة</button></div>
     </div>
     <div class="stars">★★★★★</div>
