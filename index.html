@@ -188,6 +188,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .search-result-name{font-size:13px;font-weight:600;color:var(--dark)}
 .search-result-price{font-size:12px;color:var(--green);margin-top:2px}
 .search-empty{text-align:center;color:var(--muted);font-size:13px;padding:1.5rem 0}
+/* MAGAZINE */
+.mag-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(30,42,24,.07);transition:transform .2s,box-shadow .2s;cursor:pointer}
+.mag-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(30,42,24,.13)}
+.mag-card-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--green-light);display:block}
+.mag-card-img-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--green-light),#d4e8c2);display:flex;align-items:center;justify-content:center}
+.mag-card-body{padding:1.25rem 1.5rem 1.5rem}
+.mag-card-date{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem}
+.mag-card-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--dark);line-height:1.3;margin-bottom:.5rem}
+.mag-card-excerpt{font-size:12px;color:var(--muted);line-height:1.7}
+.mag-card-tag{display:inline-block;background:var(--green-light);color:var(--green);font-size:10px;padding:2px 10px;border-radius:20px;margin-bottom:.75rem;font-weight:600;letter-spacing:.5px}
+.art-hero-img{width:100%;max-height:420px;object-fit:cover;border-radius:16px;margin-bottom:2rem}
+.art-video-wrap{position:relative;padding-bottom:56.25%;height:0;border-radius:16px;overflow:hidden;margin-bottom:2rem}
+.art-video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.art-body{font-size:15px;line-height:1.9;color:#3a3a3a;white-space:pre-wrap}
+.art-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:400;color:var(--dark);line-height:1.2;margin-bottom:.75rem}
+.art-meta{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:2rem;display:flex;gap:1rem;align-items:center}
+
 /* WISHLIST */
 .wish-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:4;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .wish-btn:hover{background:#fff;transform:scale(1.1)}
@@ -482,6 +499,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   <div class="nav-links">
     <a onclick="showPage('home')" id="nav-home" class="active">Home</a>
     <a onclick="showPage('shop')" id="nav-shop">Shop</a>
+    <a onclick="showPage('magazine')" id="nav-magazine">Magazine</a>
     <a onclick="showPage('about')" id="nav-about">About</a>
     <a onclick="showDashLogin()" style="color:var(--muted)"><i class="ti ti-lock" style="font-size:14px;vertical-align:middle"></i> Admin</a>
   </div>
@@ -844,6 +862,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       <div class="dash-nav-item" onclick="showDashSection('reviews-slider',this)"><i class="ti ti-message-star"></i> Reviews Slider / سلايدر الآراء</div>
       <div class="dash-nav-item" onclick="showDashSection('about-edit',this)"><i class="ti ti-file-text"></i> About Page / عن المتجر</div>
       <div class="dash-nav-item" onclick="showDashSection('settings',this)"><i class="ti ti-settings"></i> Settings / الإعدادات</div>
+      <div class="dash-nav-item" onclick="showDashSection('blog',this)"><i class="ti ti-news"></i> Magazine / المجلة</div>
       <div style="position:absolute;bottom:2rem;width:100%">
         <div class="dash-nav-item" onclick="showPage('home')"><i class="ti ti-external-link"></i> View Store</div>
         <div class="dash-nav-item" onclick="showPage('home')" style="color:rgba(255,100,100,.6)"><i class="ti ti-logout" style="color:rgba(255,100,100,.6)"></i> Logout</div>
@@ -1145,6 +1164,22 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
       </div>
 
     </div>
+
+      <!-- ══ BLOG / MAGAZINE SECTION ══ -->
+      <div id="dash-blog" class="dash-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+          <h3 class="dash-card-title" style="margin:0">Magazine Articles / مقالات المجلة</h3>
+          <button class="btn btn-green" onclick="openArticleModal()"><i class="ti ti-plus"></i> New Article / مقال جديد</button>
+        </div>
+        <div id="articles-table-wrap">
+          <table class="dash-table" style="width:100%">
+            <thead><tr><th>Image</th><th>Title EN</th><th>Title AR</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="articles-tbody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">No articles yet / لا توجد مقالات</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+  </div>
   </div>
 
   <!-- MOBILE BOTTOM NAV -->
@@ -1170,6 +1205,52 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   </div>
 
 </div>
+
+<!-- ════════════ MAGAZINE PAGE ════════════ -->
+<div id="page-magazine" class="page">
+  <div style="padding:1.5rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.1)">
+    <a onclick="showPage('home')" style="cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-decoration:none"><i class="ti ti-arrow-left"></i> Back / رجوع</a>
+  </div>
+  <div style="text-align:center;padding:3rem 2.5rem 1.5rem">
+    <p class="sec-tag">Ayo Delight</p>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;color:var(--dark);margin:.5rem 0">Magazine</h1>
+    <p style="font-size:13px;color:var(--muted);max-width:480px;margin:0 auto">مجلتنا الطبيعية — نصائح، مقالات، وإلهام للعناية بجمالك</p>
+  </div>
+  <div class="section" style="padding-top:1.5rem">
+    <div id="mag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2rem;padding-bottom:3rem">
+      <div class="loading"><i class="ti ti-loader"></i> Loading articles...</div>
+    </div>
+  </div>
+  <footer><div class="footer-bottom" style="padding:1.5rem 2.5rem"><p class="footer-copy">© 2026 Ayo Delight Magazine</p></div></footer>
+</div>
+
+<!-- ════════════ ARTICLE PAGE ════════════ -->
+<div id="page-article" class="page">
+  <div style="padding:1.5rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.1)">
+    <a onclick="showPage('magazine')" style="cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-decoration:none"><i class="ti ti-arrow-left"></i> Back to Magazine / رجوع للمجلة</a>
+  </div>
+  <div id="article-content" style="max-width:780px;margin:0 auto;padding:2.5rem 2rem 4rem"></div>
+  <footer><div class="footer-bottom" style="padding:1.5rem 2.5rem"><p class="footer-copy">© 2026 Ayo Delight Magazine</p></div></footer>
+</div>
+
+<div class="modal-overlay" id="article-modal" style="z-index:10001">
+  <div class="modal" style="max-width:640px;width:95vw;max-height:90vh;overflow-y:auto">
+    <h3 class="modal-title" id="article-modal-title">New Article / مقال جديد</h3>
+    <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem">
+      <div class="form-group"><label>Title (English)</label><input type="text" id="art-title-en" placeholder="Article title in English"/></div>
+      <div class="form-group"><label>العنوان (عربي)</label><input type="text" id="art-title-ar" placeholder="عنوان المقال بالعربي" dir="rtl"/></div>
+      <div class="form-group"><label>Cover Image URL / رابط صورة الغلاف</label><input type="text" id="art-image" placeholder="https://..."/></div>
+      <div class="form-group"><label>YouTube Video URL (optional) / رابط يوتيوب (اختياري)</label><input type="text" id="art-video" placeholder="https://www.youtube.com/watch?v=..."/></div>
+      <div class="form-group"><label>Content (English)</label><textarea id="art-body-en" rows="5" placeholder="Write article content in English..."></textarea></div>
+      <div class="form-group"><label>المحتوى (عربي)</label><textarea id="art-body-ar" rows="5" placeholder="اكتبي محتوى المقال بالعربي..." dir="rtl"></textarea></div>
+      <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem">
+        <button class="btn btn-outline" onclick="closeArticleModal()">Cancel / إلغاء</button>
+        <button class="btn btn-green" onclick="saveArticle()">Save / حفظ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
     <h3 class="modal-title" id="modal-title">Add New Product</h3>
@@ -1584,7 +1665,7 @@ function slugify(str) {
 function showPage(name, skipHash) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const isStore = ['home','shop','product','cart','checkout','success','about','wishlist'].includes(name);
+  const isStore = ['home','shop','product','cart','checkout','success','about','wishlist','magazine','article'].includes(name);
   document.getElementById('main-nav').style.display = (name==='dashboard'||name==='dash-login') ? 'none' : 'flex';
   // show/hide mobile dash bottom nav
   const mobNav = document.getElementById('mob-dash-nav');
@@ -1596,6 +1677,8 @@ function showPage(name, skipHash) {
   if(name==='cart') renderCartPage();
   if(name==='shop') initStore();
   if(name==='wishlist') renderWishlist();
+  if(name==='magazine') renderMagazinePage();
+  if(name==='blog') { loadArticles().then(renderArticlesTable); }
   // ── Update URL hash ──
   if (!skipHash) {
     const skipPages = ['dashboard','dash-login','cart','checkout','success'];
@@ -2013,6 +2096,174 @@ function loadSavedSettings() {
 
 // ═══ UTILS ═══
 let currentLang = 'en';
+// ═══ MAGAZINE / BLOG ═══
+let articles = [];
+let editingArticleId = null;
+
+async function loadArticles() {
+  try {
+    const { data, error } = await sb.from('articles').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    articles = data || [];
+  } catch(e) {
+    articles = JSON.parse(localStorage.getItem('ayo_articles') || '[]');
+  }
+}
+
+function saveArticleLocal() {
+  localStorage.setItem('ayo_articles', JSON.stringify(articles));
+}
+
+function openArticleModal(id = null) {
+  editingArticleId = id;
+  const modal = document.getElementById('article-modal');
+  if (id) {
+    const a = articles.find(x => x.id === id);
+    document.getElementById('article-modal-title').textContent = 'Edit Article / تعديل المقال';
+    document.getElementById('art-title-en').value = a.title_en || '';
+    document.getElementById('art-title-ar').value = a.title_ar || '';
+    document.getElementById('art-image').value = a.image || '';
+    document.getElementById('art-video').value = a.video_url || '';
+    document.getElementById('art-body-en').value = a.body_en || '';
+    document.getElementById('art-body-ar').value = a.body_ar || '';
+  } else {
+    document.getElementById('article-modal-title').textContent = 'New Article / مقال جديد';
+    ['art-title-en','art-title-ar','art-image','art-video','art-body-en','art-body-ar'].forEach(id => document.getElementById(id).value = '');
+  }
+  modal.classList.add('open');
+}
+
+function closeArticleModal() {
+  document.getElementById('article-modal').classList.remove('open');
+  editingArticleId = null;
+}
+
+async function saveArticle() {
+  const titleEn = document.getElementById('art-title-en').value.trim();
+  const titleAr = document.getElementById('art-title-ar').value.trim();
+  if (!titleEn && !titleAr) { alert('Please enter a title / أدخل العنوان'); return; }
+
+  const payload = {
+    title_en: titleEn,
+    title_ar: titleAr,
+    image: document.getElementById('art-image').value.trim(),
+    video_url: document.getElementById('art-video').value.trim(),
+    body_en: document.getElementById('art-body-en').value.trim(),
+    body_ar: document.getElementById('art-body-ar').value.trim(),
+  };
+
+  try {
+    if (editingArticleId) {
+      const { error } = await sb.from('articles').update(payload).eq('id', editingArticleId);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from('articles').insert([{ ...payload }]);
+      if (error) throw error;
+    }
+  } catch(e) {
+    // fallback to localStorage
+    if (editingArticleId) {
+      const idx = articles.findIndex(a => a.id === editingArticleId);
+      if (idx > -1) articles[idx] = { ...articles[idx], ...payload };
+    } else {
+      articles.unshift({ id: Date.now(), ...payload, created_at: new Date().toISOString() });
+    }
+    saveArticleLocal();
+  }
+
+  closeArticleModal();
+  await loadArticles();
+  renderArticlesTable();
+}
+
+async function deleteArticle(id) {
+  if (!confirm('Delete this article? / حذف المقال؟')) return;
+  try {
+    await sb.from('articles').delete().eq('id', id);
+  } catch(e) {}
+  articles = articles.filter(a => a.id !== id);
+  saveArticleLocal();
+  renderArticlesTable();
+}
+
+function renderArticlesTable() {
+  const tbody = document.getElementById('articles-tbody');
+  if (!tbody) return;
+  if (!articles.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">No articles yet / لا توجد مقالات</td></tr>';
+    return;
+  }
+  tbody.innerHTML = articles.map(a => `
+    <tr>
+      <td>${a.image ? `<img src="${a.image}" style="width:60px;height:40px;object-fit:cover;border-radius:6px" onerror="this.style.display='none'"/>` : '<i class="ti ti-photo" style="color:var(--muted)"></i>'}</td>
+      <td style="font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title_en || '—'}</td>
+      <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" dir="rtl">${a.title_ar || '—'}</td>
+      <td style="font-size:11px;color:var(--muted)">${new Date(a.created_at).toLocaleDateString()}</td>
+      <td>
+        <button class="btn btn-outline" style="padding:.3rem .7rem;font-size:11px;margin-right:4px" onclick="openArticleModal('${a.id}')"><i class="ti ti-edit"></i></button>
+        <button class="btn" style="padding:.3rem .7rem;font-size:11px;background:#fce4e4;color:#a33;border:none" onclick="deleteArticle('${a.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function getYouTubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function openArticle(id) {
+  const a = articles.find(x => String(x.id) === String(id));
+  if (!a) return;
+  const isAr = typeof currentLang !== 'undefined' && currentLang === 'ar';
+  const title = isAr && a.title_ar ? a.title_ar : (a.title_en || a.title_ar || '');
+  const body  = isAr && a.body_ar  ? a.body_ar  : (a.body_en  || a.body_ar  || '');
+  const date  = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const ytId  = getYouTubeId(a.video_url);
+
+  let html = `<p class="sec-tag" style="margin-bottom:.5rem">Ayo Delight Magazine</p>
+    <h1 class="art-title" dir="${isAr?'rtl':'ltr'}">${title}</h1>
+    <div class="art-meta"><i class="ti ti-calendar-event"></i>${date}</div>`;
+
+  if (a.image) html += `<img src="${a.image}" class="art-hero-img" alt="${title}" onerror="this.style.display='none'"/>`;
+  if (ytId)    html += `<div class="art-video-wrap"><iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen loading="lazy"></iframe></div>`;
+  if (body)    html += `<div class="art-body" dir="${isAr?'rtl':'ltr'}">${body}</div>`;
+
+  document.getElementById('article-content').innerHTML = html;
+  showPage('article');
+}
+
+async function renderMagazinePage() {
+  await loadArticles();
+  const grid = document.getElementById('mag-grid');
+  if (!grid) return;
+  if (!articles.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted)"><i class="ti ti-news" style="font-size:48px;opacity:.3;display:block;margin-bottom:1rem"></i>No articles yet / لا توجد مقالات بعد</div>';
+    return;
+  }
+  const isAr = typeof currentLang !== 'undefined' && currentLang === 'ar';
+  grid.innerHTML = articles.map(a => {
+    const title   = isAr && a.title_ar ? a.title_ar : (a.title_en || a.title_ar || '');
+    const excerpt = isAr && a.body_ar  ? a.body_ar.substring(0,120)  : (a.body_en  || '').substring(0,120);
+    const date    = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    const ytId    = getYouTubeId(a.video_url);
+    const thumb   = a.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '');
+    return `<div class="mag-card" onclick="openArticle('${a.id}')">
+      ${thumb
+        ? `<img src="${thumb}" class="mag-card-img" alt="${title}" onerror="this.parentElement.querySelector('.mag-card-img-placeholder')&&(this.style.display='none')"/>`
+        : `<div class="mag-card-img-placeholder"><i class="ti ti-news" style="font-size:40px;color:var(--green);opacity:.4"></i></div>`}
+      <div class="mag-card-body">
+        <div class="mag-card-tag">Ayo Delight Magazine</div>
+        <p class="mag-card-date">${date}</p>
+        <h3 class="mag-card-title" dir="${isAr?'rtl':'ltr'}">${title}</h3>
+        ${excerpt ? `<p class="mag-card-excerpt" dir="${isAr?'rtl':'ltr'}">${excerpt}${excerpt.length>=120?'...':''}</p>` : ''}
+        ${ytId ? '<p style="font-size:11px;color:var(--green);margin-top:.5rem"><i class="ti ti-brand-youtube"></i> Video included / يحتوي على فيديو</p>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ═══ WISHLIST ═══
 let wishlist = JSON.parse(localStorage.getItem('ayo_wishlist') || '[]');
 
