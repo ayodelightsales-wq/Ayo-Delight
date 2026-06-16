@@ -2318,19 +2318,19 @@ function getYouTubeId(url) {
 function openArticle(id) {
   const a = articles.find(x => String(x.id) === String(id));
   if (!a) return;
-  const isAr = typeof currentLang !== 'undefined' && currentLang === 'ar';
-  const title = isAr && a.title_ar ? a.title_ar : (a.title_en || a.title_ar || '');
-  const body  = isAr && a.body_ar  ? a.body_ar  : (a.body_en  || a.body_ar  || '');
-  const date  = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  const ytId  = getYouTubeId(a.video_url);
+  const date = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const ytId = getYouTubeId(a.video_url);
 
-  let html = `<p class="sec-tag" style="margin-bottom:.5rem">Ayo Delight Magazine</p>
-    <h1 class="art-title" dir="${isAr?'rtl':'ltr'}">${title}</h1>
+  let html = `
+    <p class="sec-tag" style="margin-bottom:.5rem">Ayo Delight Magazine</p>
+    <h1 class="art-title" data-lang="en" style="display:${currentLang==='ar'?'none':''}">${a.title_en || a.title_ar || ''}</h1>
+    <h1 class="art-title" data-lang="ar" dir="rtl" style="display:${currentLang==='en'?'none':''}">${a.title_ar || a.title_en || ''}</h1>
     <div class="art-meta"><i class="ti ti-calendar-event"></i>${date}</div>`;
 
-  if (a.image) html += `<img src="${a.image}" class="art-hero-img" alt="${title}" onerror="this.style.display='none'"/>`;
+  if (a.image) html += `<img src="${a.image}" class="art-hero-img" alt="" onerror="this.style.display='none'"/>`;
   if (ytId)    html += `<div class="art-video-wrap"><iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen loading="lazy"></iframe></div>`;
-  if (body)    html += `<div class="art-body" dir="${isAr?'rtl':'ltr'}">${body}</div>`;
+  if (a.body_en) html += `<div class="art-body" data-lang="en" style="display:${currentLang==='ar'?'none':''}">${a.body_en}</div>`;
+  if (a.body_ar) html += `<div class="art-body" data-lang="ar" dir="rtl" style="display:${currentLang==='en'?'none':''}">${a.body_ar}</div>`;
 
   document.getElementById('article-content').innerHTML = html;
   showPage('article');
@@ -2524,6 +2524,9 @@ function setLang(lang, btn) {
     if(descEn) descEn.style.display = lang==='ar' ? 'none' : '';
     if(descAr) descAr.style.display = lang==='en' ? 'none' : '';
   }
+  // Re-render magazine cards on language switch
+  const magGrid = document.getElementById('mag-grid');
+  if (magGrid && magGrid.children.length > 0 && articles.length > 0) renderMagazinePage();
 }
 function selectPayment(el) { document.querySelectorAll('.payment-option').forEach(o=>o.classList.remove('active')); el.classList.add('active'); }
 function showToast(msg) { const t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800); }
