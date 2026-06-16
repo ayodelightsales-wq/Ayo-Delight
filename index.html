@@ -2290,8 +2290,8 @@ function renderArticlesTable() {
       <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" dir="rtl">${a.title_ar || '—'}</td>
       <td style="font-size:11px;color:var(--muted)">${new Date(a.created_at).toLocaleDateString()}</td>
       <td>
-        <button class="btn btn-outline" style="padding:.3rem .7rem;font-size:11px;margin-right:4px" onclick="openArticleModal('${a.id}')"><i class="ti ti-edit"></i></button>
-        <button class="btn" style="padding:.3rem .7rem;font-size:11px;background:#fce4e4;color:#a33;border:none" onclick="deleteArticle('${a.id}')"><i class="ti ti-trash"></i></button>
+        <button class="btn btn-outline" style="padding:.3rem .7rem;font-size:11px;margin-right:4px" onclick="openArticleModal(this.dataset.id)" data-id="${a.id}"><i class="ti ti-edit"></i></button>
+        <button class="btn" style="padding:.3rem .7rem;font-size:11px;background:#fce4e4;color:#a33;border:none" onclick="deleteArticle(this.dataset.id)" data-id="${a.id}"><i class="ti ti-trash"></i></button>
       </td>
     </tr>
   `).join('');
@@ -2339,7 +2339,7 @@ async function renderMagazinePage() {
     const date    = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
     const ytId    = getYouTubeId(a.video_url);
     const thumb   = a.image || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '');
-    return `<div class="mag-card" onclick="openArticle('${a.id}')">
+    return `<div class="mag-card" onclick="openArticle(this.dataset.id)" data-id="${a.id}">
       ${thumb
         ? `<img src="${thumb}" class="mag-card-img" alt="${title}" onerror="this.parentElement.querySelector('.mag-card-img-placeholder')&&(this.style.display='none')"/>`
         : `<div class="mag-card-img-placeholder"><i class="ti ti-news" style="font-size:40px;color:var(--green);opacity:.4"></i></div>`}
