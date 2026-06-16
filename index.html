@@ -1237,7 +1237,21 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1rem">
       <div class="form-group"><label>Title (English)</label><input type="text" id="art-title-en" placeholder="Article title in English"/></div>
       <div class="form-group"><label>العنوان (عربي)</label><input type="text" id="art-title-ar" placeholder="عنوان المقال بالعربي" dir="rtl"/></div>
-      <div class="form-group"><label>Cover Image URL / رابط صورة الغلاف</label><input type="text" id="art-image" placeholder="https://..."/></div>
+      <div class="form-group">
+        <label>Cover Image / صورة الغلاف</label>
+        <div id="art-img-preview-wrap" style="display:none;margin-bottom:.75rem;position:relative;width:100%;max-height:180px;border-radius:10px;overflow:hidden;background:#f5f5f5">
+          <img id="art-img-preview" style="width:100%;max-height:180px;object-fit:cover;display:block" src="" alt="preview"/>
+          <button onclick="clearArtImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center"><i class="ti ti-x"></i></button>
+        </div>
+        <div id="art-img-upload-area" style="border:1.5px dashed rgba(30,42,24,.2);border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .2s" onclick="document.getElementById('art-img-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--green)'" ondragleave="this.style.borderColor='rgba(30,42,24,.2)'" ondrop="handleArtImgDrop(event)">
+          <i class="ti ti-upload" style="font-size:24px;color:var(--green);display:block;margin-bottom:.5rem"></i>
+          <p style="font-size:12px;color:var(--muted);margin:0">Click to choose image / اضغط لاختيار صورة</p>
+          <p style="font-size:11px;color:var(--muted);margin:.25rem 0 0">or drag & drop</p>
+        </div>
+        <input type="file" id="art-img-file" accept="image/*" style="display:none" onchange="previewArtImage(this)"/>
+        <input type="hidden" id="art-image"/>
+        <div id="art-img-upload-status" style="margin-top:.5rem;font-size:12px;display:none"></div>
+      </div>
       <div class="form-group"><label>YouTube Video URL (optional) / رابط يوتيوب (اختياري)</label><input type="text" id="art-video" placeholder="https://www.youtube.com/watch?v=..."/></div>
       <div class="form-group"><label>Content (English)</label><textarea id="art-body-en" rows="5" placeholder="Write article content in English..."></textarea></div>
       <div class="form-group"><label>المحتوى (عربي)</label><textarea id="art-body-ar" rows="5" placeholder="اكتبي محتوى المقال بالعربي..." dir="rtl"></textarea></div>
@@ -2095,6 +2109,71 @@ function loadSavedSettings() {
 
 // ═══ UTILS ═══
 let currentLang = 'en';
+// ═══ ARTICLE IMAGE UPLOAD ═══
+let artImgFile = null;
+
+function previewArtImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+  artImgFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('art-img-preview').src = e.target.result;
+    document.getElementById('art-img-preview-wrap').style.display = 'block';
+    document.getElementById('art-img-upload-area').style.display = 'none';
+    document.getElementById('art-img-upload-status').style.display = 'none';
+    document.getElementById('art-image').value = ''; // clear old URL until upload confirmed
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleArtImgDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'rgba(30,42,24,.2)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    const input = document.getElementById('art-img-file');
+    input.files = dt.files;
+    previewArtImage(input);
+  }
+}
+
+function clearArtImage() {
+  artImgFile = null;
+  document.getElementById('art-image').value = '';
+  document.getElementById('art-img-preview').src = '';
+  document.getElementById('art-img-preview-wrap').style.display = 'none';
+  document.getElementById('art-img-upload-area').style.display = 'block';
+  document.getElementById('art-img-file').value = '';
+  document.getElementById('art-img-upload-status').style.display = 'none';
+}
+
+async function uploadArtImage() {
+  if (!artImgFile) return document.getElementById('art-image').value || null;
+  const status = document.getElementById('art-img-upload-status');
+  status.style.display = 'block';
+  status.style.color = 'var(--green)';
+  status.innerHTML = '<i class="ti ti-loader"></i> Uploading... / جاري الرفع...';
+  try {
+    const ext = artImgFile.name.split('.').pop();
+    const fileName = `articles/art_${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from(BUCKET).upload(fileName, artImgFile, { upsert: true, contentType: artImgFile.type });
+    if (error) throw error;
+    const url = `${STORAGE_URL}${fileName}`;
+    document.getElementById('art-image').value = url;
+    status.style.color = '#2d6a3f';
+    status.innerHTML = '✅ Image uploaded / تم رفع الصورة';
+    artImgFile = null;
+    return url;
+  } catch(e) {
+    status.style.color = '#a33';
+    status.innerHTML = '❌ Upload failed / فشل الرفع: ' + (e.message || e);
+    return null;
+  }
+}
+
 // ═══ MAGAZINE / BLOG ═══
 let articles = [];
 let editingArticleId = null;
@@ -2121,13 +2200,22 @@ function openArticleModal(id = null) {
     document.getElementById('article-modal-title').textContent = 'Edit Article / تعديل المقال';
     document.getElementById('art-title-en').value = a.title_en || '';
     document.getElementById('art-title-ar').value = a.title_ar || '';
-    document.getElementById('art-image').value = a.image || '';
     document.getElementById('art-video').value = a.video_url || '';
     document.getElementById('art-body-en').value = a.body_en || '';
     document.getElementById('art-body-ar').value = a.body_ar || '';
+    document.getElementById('art-image').value = a.image || '';
+    if (a.image) {
+      document.getElementById('art-img-preview').src = a.image;
+      document.getElementById('art-img-preview-wrap').style.display = 'block';
+      document.getElementById('art-img-upload-area').style.display = 'none';
+    } else {
+      document.getElementById('art-img-preview-wrap').style.display = 'none';
+      document.getElementById('art-img-upload-area').style.display = 'block';
+    }
   } else {
     document.getElementById('article-modal-title').textContent = 'New Article / مقال جديد';
-    ['art-title-en','art-title-ar','art-image','art-video','art-body-en','art-body-ar'].forEach(id => document.getElementById(id).value = '');
+    ['art-title-en','art-title-ar','art-video','art-body-en','art-body-ar'].forEach(id => document.getElementById(id).value = '');
+    clearArtImage();
   }
   modal.classList.add('open');
 }
@@ -2142,10 +2230,13 @@ async function saveArticle() {
   const titleAr = document.getElementById('art-title-ar').value.trim();
   if (!titleEn && !titleAr) { alert('Please enter a title / أدخل العنوان'); return; }
 
+  // Upload image first if file selected
+  const imageUrl = await uploadArtImage();
+
   const payload = {
     title_en: titleEn,
     title_ar: titleAr,
-    image: document.getElementById('art-image').value.trim(),
+    image: imageUrl || document.getElementById('art-image').value.trim(),
     video_url: document.getElementById('art-video').value.trim(),
     body_en: document.getElementById('art-body-en').value.trim(),
     body_ar: document.getElementById('art-body-ar').value.trim(),
