@@ -188,6 +188,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .search-result-name{font-size:13px;font-weight:600;color:var(--dark)}
 .search-result-price{font-size:12px;color:var(--green);margin-top:2px}
 .search-empty{text-align:center;color:var(--muted);font-size:13px;padding:1.5rem 0}
+/* MAGAZINE BANNER SLIDER */
+.mag-banner-slider{position:relative;width:100%;overflow:hidden;background:#111;max-height:480px}
+.mag-banner-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.mag-banner-track img{width:100%;flex-shrink:0;height:400px;object-fit:cover;display:block}
+@media(max-width:600px){.mag-banner-track img{height:220px}}
+.mag-banner-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.85);border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--dark);z-index:5;transition:background .2s}
+.mag-banner-arrow:hover{background:#fff}
+.mag-banner-arrow.prev{left:1rem}
+.mag-banner-arrow.next{right:1rem}
+.mag-banner-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:7px}
+.mag-banner-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:background .2s;border:none}
+.mag-banner-dot.active{background:#fff}
+
 /* MAGAZINE */
 .mag-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(30,42,24,.07);transition:transform .2s,box-shadow .2s;cursor:pointer}
 .mag-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(30,42,24,.13)}
@@ -1165,6 +1178,18 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 
       <!-- ══ BLOG / MAGAZINE SECTION ══ -->
       <div id="dash-blog" class="dash-section">
+        <!-- Banner Management -->
+        <div class="dash-card" style="margin-bottom:2rem">
+          <h3 class="dash-card-title" style="margin-bottom:1rem"><i class="ti ti-photo"></i> Magazine Banner Slider / بانر المجلة</h3>
+          <div id="mag-banner-dash-list" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem"></div>
+          <label class="btn btn-outline" style="cursor:pointer;display:inline-flex;align-items:center;gap:.5rem">
+            <i class="ti ti-upload"></i> Add Image / أضف صورة
+            <input type="file" id="mag-banner-file" accept="image/*" style="display:none" onchange="uploadMagBanner(this)"/>
+          </label>
+          <p style="font-size:11px;color:var(--muted);margin-top:.5rem">Recommended size: 1400×400px</p>
+        </div>
+
+        <!-- Articles Management -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
           <h3 class="dash-card-title" style="margin:0">Magazine Articles / مقالات المجلة</h3>
           <button class="btn btn-green" onclick="openArticleModal()"><i class="ti ti-plus"></i> New Article / مقال جديد</button>
@@ -1209,6 +1234,15 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   <div style="padding:1.5rem 2.5rem;border-bottom:.5px solid rgba(30,42,24,.1)">
     <a onclick="showPage('home')" style="cursor:pointer;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;text-decoration:none"><i class="ti ti-arrow-left"></i> Back / رجوع</a>
   </div>
+
+  <!-- MAGAZINE BANNER SLIDER -->
+  <div class="mag-banner-slider" id="mag-banner-slider" style="display:none">
+    <div class="mag-banner-track" id="mag-banner-track"></div>
+    <button class="mag-banner-arrow prev" onclick="magBannerSlide(-1)"><i class="ti ti-chevron-left"></i></button>
+    <button class="mag-banner-arrow next" onclick="magBannerSlide(1)"><i class="ti ti-chevron-right"></i></button>
+    <div class="mag-banner-dots" id="mag-banner-dots"></div>
+  </div>
+
   <div style="text-align:center;padding:3rem 2.5rem 1.5rem">
     <p class="sec-tag">Ayo Delight</p>
     <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;color:var(--dark);margin:.5rem 0">Magazine</h1>
@@ -1689,8 +1723,8 @@ function showPage(name, skipHash) {
   if(name==='cart') renderCartPage();
   if(name==='shop') initStore();
   if(name==='wishlist') renderWishlist();
-  if(name==='magazine') renderMagazinePage();
-  if(name==='blog') { loadArticles().then(renderArticlesTable); }
+  if(name==='magazine') { renderMagazinePage(); renderMagBannerSlider(); }
+  if(name==='blog') { loadArticles().then(renderArticlesTable); renderMagBannerDashList(); }
   // ── Update URL hash ──
   if (!skipHash) {
     const skipPages = ['dashboard','dash-login','cart','checkout','success'];
@@ -1810,7 +1844,7 @@ function showDashSection(name, el) {
   document.getElementById('dash-'+name).classList.add('active');
   if(el) el.classList.add('active');
   if(name==='reviews-slider') { renderRvDashList(); renderRvDashPreview(); }
-  if(name==='blog') { loadArticles().then(renderArticlesTable); }
+  if(name==='blog') { loadArticles().then(renderArticlesTable); renderMagBannerDashList(); }
 }
 
 function pdGoTo(idx) {
@@ -2109,6 +2143,87 @@ function loadSavedSettings() {
 
 // ═══ UTILS ═══
 let currentLang = 'en';
+// ═══ MAGAZINE BANNER SLIDER ═══
+let magBannerImages = JSON.parse(localStorage.getItem('mag_banner_images') || '[]');
+let magBannerIdx = 0;
+let magBannerTimer = null;
+
+function saveMagBanners() {
+  localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
+}
+
+function renderMagBannerSlider() {
+  const slider = document.getElementById('mag-banner-slider');
+  const track  = document.getElementById('mag-banner-track');
+  const dots   = document.getElementById('mag-banner-dots');
+  if (!slider || !track) return;
+
+  if (!magBannerImages.length) { slider.style.display = 'none'; return; }
+
+  slider.style.display = 'block';
+  track.innerHTML = magBannerImages.map(src => `<img src="${src}" alt="banner" loading="lazy"/>`).join('');
+  dots.innerHTML  = magBannerImages.map((_,i) => `<button class="mag-banner-dot ${i===0?'active':''}" onclick="magBannerGoTo(${i})"></button>`).join('');
+
+  magBannerGoTo(0);
+  clearInterval(magBannerTimer);
+  if (magBannerImages.length > 1) magBannerTimer = setInterval(() => magBannerSlide(1), 4500);
+}
+
+function magBannerGoTo(idx) {
+  const track = document.getElementById('mag-banner-track');
+  if (!track) return;
+  magBannerIdx = (idx + magBannerImages.length) % magBannerImages.length;
+  track.style.transform = `translateX(-${magBannerIdx * 100}%)`;
+  document.querySelectorAll('.mag-banner-dot').forEach((d,i) => d.classList.toggle('active', i === magBannerIdx));
+}
+
+function magBannerSlide(dir) { magBannerGoTo(magBannerIdx + dir); }
+
+async function uploadMagBanner(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = input.parentElement;
+  btn.innerHTML = '<i class="ti ti-loader"></i> Uploading...';
+
+  try {
+    const ext = file.name.split('.').pop();
+    const fileName = `mag-banners/mb_${Date.now()}.${ext}`;
+    const { error } = await sb.storage.from(BUCKET).upload(fileName, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    const url = `${STORAGE_URL}${fileName}`;
+    magBannerImages.push(url);
+    saveMagBanners();
+  } catch(e) {
+    // fallback: use local blob
+    const url = URL.createObjectURL(file);
+    magBannerImages.push(url);
+    saveMagBanners();
+  }
+
+  btn.innerHTML = '<i class="ti ti-upload"></i> Add Image / أضف صورة <input type="file" id="mag-banner-file" accept="image/*" style="display:none" onchange="uploadMagBanner(this)"/>';
+  renderMagBannerDashList();
+  renderMagBannerSlider();
+  input.value = '';
+}
+
+function renderMagBannerDashList() {
+  const list = document.getElementById('mag-banner-dash-list');
+  if (!list) return;
+  if (!magBannerImages.length) { list.innerHTML = '<p style="font-size:12px;color:var(--muted)">No images yet / لا توجد صور</p>'; return; }
+  list.innerHTML = magBannerImages.map((src, i) => `
+    <div style="position:relative;width:120px;height:70px;border-radius:8px;overflow:hidden;flex-shrink:0">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover"/>
+      <button onclick="deleteMagBanner(${i})" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center"><i class="ti ti-x"></i></button>
+    </div>`).join('');
+}
+
+function deleteMagBanner(idx) {
+  magBannerImages.splice(idx, 1);
+  saveMagBanners();
+  renderMagBannerDashList();
+  renderMagBannerSlider();
+}
+
 // ═══ ARTICLE IMAGE UPLOAD ═══
 let artImgFile = null;
 
