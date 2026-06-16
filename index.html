@@ -1163,8 +1163,6 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         </div>
       </div>
 
-    </div>
-
       <!-- ══ BLOG / MAGAZINE SECTION ══ -->
       <div id="dash-blog" class="dash-section">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
@@ -1179,7 +1177,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         </div>
       </div>
 
-  </div>
+    </div>
   </div>
 
   <!-- MOBILE BOTTOM NAV -->
@@ -1798,6 +1796,7 @@ function showDashSection(name, el) {
   document.getElementById('dash-'+name).classList.add('active');
   if(el) el.classList.add('active');
   if(name==='reviews-slider') { renderRvDashList(); renderRvDashPreview(); }
+  if(name==='blog') { loadArticles().then(renderArticlesTable); }
 }
 
 function pdGoTo(idx) {
