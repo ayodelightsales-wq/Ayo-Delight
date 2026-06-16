@@ -2196,7 +2196,7 @@ function openArticleModal(id = null) {
   editingArticleId = id;
   const modal = document.getElementById('article-modal');
   if (id) {
-    const a = articles.find(x => x.id === id);
+    const a = articles.find(x => String(x.id) === String(id));
     document.getElementById('article-modal-title').textContent = 'Edit Article / تعديل المقال';
     document.getElementById('art-title-en').value = a.title_en || '';
     document.getElementById('art-title-ar').value = a.title_ar || '';
@@ -2230,6 +2230,9 @@ async function saveArticle() {
   const titleAr = document.getElementById('art-title-ar').value.trim();
   if (!titleEn && !titleAr) { alert('Please enter a title / أدخل العنوان'); return; }
 
+  const saveBtn = document.querySelector('#article-modal .btn-green');
+  if(saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+
   // Upload image first if file selected
   const imageUrl = await uploadArtImage();
 
@@ -2242,28 +2245,37 @@ async function saveArticle() {
     body_ar: document.getElementById('art-body-ar').value.trim(),
   };
 
+  let success = false;
   try {
     if (editingArticleId) {
-      const { error } = await sb.from('articles').update(payload).eq('id', editingArticleId);
-      if (error) throw error;
+      const { data, error } = await sb.from('articles').update(payload).eq('id', editingArticleId).select();
+      if (error) { console.error('Supabase update error:', error); throw error; }
+      success = true;
     } else {
-      const { error } = await sb.from('articles').insert([{ ...payload }]);
-      if (error) throw error;
+      const { data, error } = await sb.from('articles').insert([{ ...payload }]).select();
+      if (error) { console.error('Supabase insert error:', error); throw error; }
+      success = true;
     }
   } catch(e) {
+    console.warn('Supabase failed, using localStorage:', e);
     // fallback to localStorage
     if (editingArticleId) {
-      const idx = articles.findIndex(a => a.id === editingArticleId);
+      const idx = articles.findIndex(a => String(a.id) === String(editingArticleId));
       if (idx > -1) articles[idx] = { ...articles[idx], ...payload };
     } else {
       articles.unshift({ id: Date.now(), ...payload, created_at: new Date().toISOString() });
     }
     saveArticleLocal();
+    success = true;
   }
 
-  closeArticleModal();
-  await loadArticles();
-  renderArticlesTable();
+  if(saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save / حفظ'; }
+
+  if (success) {
+    closeArticleModal();
+    await loadArticles();
+    renderArticlesTable();
+  }
 }
 
 async function deleteArticle(id) {
