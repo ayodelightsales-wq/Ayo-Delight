@@ -192,7 +192,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .mag-banner-slider{position:relative;width:100%;overflow:hidden;background:#111;max-height:480px}
 .mag-banner-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
 .mag-banner-track img{width:100%;flex-shrink:0;height:400px;object-fit:cover;display:block}
-@media(max-width:600px){.mag-banner-track img{height:220px}}
+@media(max-width:600px){
+  .mag-banner-track img{height:200px}
+  .mag-banner-arrow{width:32px;height:32px;font-size:14px}
+  .mag-card-body{padding:1rem}
+  .mag-card-title{font-size:1.15rem}
+  .art-title{font-size:1.6rem}
+  .art-body{font-size:14px}
+  #article-content{padding:1.5rem 1rem 3rem}
+}
 .mag-banner-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.85);border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--dark);z-index:5;transition:background .2s}
 .mag-banner-arrow:hover{background:#fff}
 .mag-banner-arrow.prev{left:1rem}
@@ -540,6 +548,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <span class="mob-close" onclick="document.getElementById('mob-menu').classList.remove('open')"><i class="ti ti-x"></i></span>
     <a onclick="showPage('home');document.getElementById('mob-menu').classList.remove('open')">🏠 Home / الرئيسية</a>
     <a onclick="showPage('shop');document.getElementById('mob-menu').classList.remove('open')">🛍️ Shop / تسوق</a>
+    <a onclick="showPage('magazine');document.getElementById('mob-menu').classList.remove('open')">📰 Magazine / المجلة</a>
     <a onclick="showPage('about');document.getElementById('mob-menu').classList.remove('open')">📖 About / عنا</a>
     <a onclick="showDashLogin();document.getElementById('mob-menu').classList.remove('open')" style="color:var(--muted)">🔐 Admin</a>
     <div style="margin-top:1.5rem">
@@ -1249,7 +1258,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
     <p style="font-size:13px;color:var(--muted);max-width:480px;margin:0 auto">مجلتنا الطبيعية — نصائح، مقالات، وإلهام للعناية بجمالك</p>
   </div>
   <div class="section" style="padding-top:1.5rem">
-    <div id="mag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2rem;padding-bottom:3rem">
+    <div id="mag-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:1.5rem;padding-bottom:3rem">
       <div class="loading"><i class="ti ti-loader"></i> Loading articles...</div>
     </div>
   </div>
