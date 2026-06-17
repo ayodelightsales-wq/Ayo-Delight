@@ -189,12 +189,14 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .search-result-price{font-size:12px;color:var(--green);margin-top:2px}
 .search-empty{text-align:center;color:var(--muted);font-size:13px;padding:1.5rem 0}
 /* MAGAZINE BANNER SLIDER */
-.mag-banner-slider{position:relative;width:100%;overflow:hidden;background:#111;max-height:480px}
-.mag-banner-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1)}
-.mag-banner-track img{width:100%;flex-shrink:0;height:400px;object-fit:cover;display:block}
-@media(max-width:600px){
-  .mag-banner-track img{height:200px}
-  .mag-banner-arrow{width:32px;height:32px;font-size:14px}
+.mag-banner-slider{position:relative;width:100%;overflow:hidden;background:#111}
+.mag-banner-track{display:flex;transition:transform .6s cubic-bezier(.4,0,.2,1);will-change:transform}
+.mag-banner-track img{width:100vw;min-width:100%;flex-shrink:0;height:420px;object-fit:cover;display:block}
+@media(max-width:768px){
+  .mag-banner-track img{height:220px;width:100vw}
+  .mag-banner-arrow{width:30px;height:30px;font-size:13px}
+  .mag-banner-arrow.prev{left:.5rem}
+  .mag-banner-arrow.next{right:.5rem}
   .mag-card-body{padding:1rem}
   .mag-card-title{font-size:1.15rem}
   .art-title{font-size:1.6rem}
@@ -2182,7 +2184,7 @@ function magBannerGoTo(idx) {
   const track = document.getElementById('mag-banner-track');
   if (!track) return;
   magBannerIdx = (idx + magBannerImages.length) % magBannerImages.length;
-  track.style.transform = `translateX(-${magBannerIdx * 100}%)`;
+  track.style.transform = `translateX(-${magBannerIdx * 100}vw)`;
   document.querySelectorAll('.mag-banner-dot').forEach((d,i) => d.classList.toggle('active', i === magBannerIdx));
 }
 
