@@ -1734,7 +1734,7 @@ function showPage(name, skipHash) {
   if(name==='cart') renderCartPage();
   if(name==='shop') initStore();
   if(name==='wishlist') renderWishlist();
-  if(name==='magazine') { renderMagazinePage(); renderMagBannerSlider(); }
+  if(name==='magazine') { loadMagBanners().then(() => { renderMagBannerSlider(); renderMagazinePage(); }); }
   if(name==='blog') { loadArticles().then(renderArticlesTable); renderMagBannerDashList(); }
   // ── Update URL hash ──
   if (!skipHash) {
@@ -2159,8 +2159,23 @@ let magBannerImages = JSON.parse(localStorage.getItem('mag_banner_images') || '[
 let magBannerIdx = 0;
 let magBannerTimer = null;
 
-function saveMagBanners() {
+async function loadMagBanners() {
+  try {
+    const { data, error } = await sb.from('settings').select('value').eq('key', 'mag_banners').single();
+    if (!error && data) {
+      magBannerImages = JSON.parse(data.value || '[]');
+      localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
+    }
+  } catch(e) {
+    magBannerImages = JSON.parse(localStorage.getItem('mag_banner_images') || '[]');
+  }
+}
+
+async function saveMagBanners() {
   localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
+  try {
+    await sb.from('settings').upsert({ key: 'mag_banners', value: JSON.stringify(magBannerImages) });
+  } catch(e) {}
 }
 
 function renderMagBannerSlider() {
