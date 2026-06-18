@@ -1192,31 +1192,12 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         <!-- Banner Management -->
         <div class="dash-card" style="margin-bottom:2rem">
           <h3 class="dash-card-title" style="margin-bottom:1rem"><i class="ti ti-photo"></i> Magazine Banner Slider / بانر المجلة</h3>
-          <div id="mag-banner-dash-list" style="margin-bottom:1rem"></div>
-
-          <!-- Add new banner form -->
-          <div style="border:1.5px dashed rgba(30,42,24,.2);border-radius:12px;padding:1.25rem">
-            <p style="font-size:12px;font-weight:600;color:var(--dark);margin-bottom:1rem">➕ Add New Banner / أضف بانر جديد</p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-              <div>
-                <p style="font-size:11px;color:var(--muted);margin-bottom:6px">🖥️ Desktop Image <span style="font-size:10px">(1400×400px)</span></p>
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(30,42,24,.15);border-radius:8px;padding:.5rem .75rem;font-size:12px">
-                  <i class="ti ti-upload"></i> <span id="banner-desktop-name">Choose file</span>
-                  <input type="file" id="banner-desktop-file" accept="image/*" style="display:none" onchange="document.getElementById('banner-desktop-name').textContent=this.files[0]?.name||'Choose file'"/>
-                </label>
-              </div>
-              <div>
-                <p style="font-size:11px;color:var(--muted);margin-bottom:6px">📱 Mobile Image <span style="font-size:10px">(600×400px)</span></p>
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(30,42,24,.15);border-radius:8px;padding:.5rem .75rem;font-size:12px">
-                  <i class="ti ti-upload"></i> <span id="banner-mobile-name">Choose file</span>
-                  <input type="file" id="banner-mobile-file" accept="image/*" style="display:none" onchange="document.getElementById('banner-mobile-name').textContent=this.files[0]?.name||'Choose file'"/>
-                </label>
-              </div>
-            </div>
-            <p style="font-size:10px;color:var(--muted);margin-bottom:.75rem">* If no mobile image selected, desktop image will be used on mobile too.</p>
-            <button class="btn btn-green" id="banner-upload-btn" onclick="submitMagBanner()"><i class="ti ti-upload"></i> Upload & Add / ارفع وأضف</button>
-            <span id="banner-upload-status" style="font-size:12px;margin-left:.75rem;display:none"></span>
-          </div>
+          <div id="mag-banner-dash-list" style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem"></div>
+          <label class="btn btn-outline" style="cursor:pointer;display:inline-flex;align-items:center;gap:.5rem">
+            <i class="ti ti-upload"></i> Add Image / أضف صورة
+            <input type="file" id="mag-banner-file" accept="image/*" style="display:none" onchange="uploadMagBanner(this)"/>
+          </label>
+          <p style="font-size:11px;color:var(--muted);margin-top:.5rem">Recommended size: 1400×400px</p>
         </div>
 
         <!-- Articles Management -->
@@ -1753,7 +1734,7 @@ function showPage(name, skipHash) {
   if(name==='cart') renderCartPage();
   if(name==='shop') initStore();
   if(name==='wishlist') renderWishlist();
-  if(name==='magazine') { loadMagBanners().then(() => { renderMagBannerSlider(); renderMagazinePage(); }); }
+  if(name==='magazine') { renderMagazinePage(); renderMagBannerSlider(); }
   if(name==='blog') { loadArticles().then(renderArticlesTable); renderMagBannerDashList(); }
   // ── Update URL hash ──
   if (!skipHash) {
@@ -2178,23 +2159,8 @@ let magBannerImages = JSON.parse(localStorage.getItem('mag_banner_images') || '[
 let magBannerIdx = 0;
 let magBannerTimer = null;
 
-async function loadMagBanners() {
-  try {
-    const { data, error } = await sb.from('settings').select('value').eq('key', 'mag_banners').single();
-    if (!error && data) {
-      magBannerImages = JSON.parse(data.value || '[]');
-      localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
-    }
-  } catch(e) {
-    magBannerImages = JSON.parse(localStorage.getItem('mag_banner_images') || '[]');
-  }
-}
-
-async function saveMagBanners() {
+function saveMagBanners() {
   localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
-  try {
-    await sb.from('settings').upsert({ key: 'mag_banners', value: JSON.stringify(magBannerImages) });
-  } catch(e) {}
 }
 
 function renderMagBannerSlider() {
@@ -2267,144 +2233,6 @@ function deleteMagBanner(idx) {
   saveMagBanners();
   renderMagBannerDashList();
   renderMagBannerSlider();
-}
-
-// ═══ MAGAZINE BANNER SLIDER ═══
-// magBannerImages = [ { desktop: url, mobile: url }, ... ]
-let magBannerImages = [];
-let magBannerIdx = 0;
-let magBannerTimer = null;
-
-async function loadMagBanners() {
-  try {
-    const { data, error } = await sb.from('settings').select('value').eq('key', 'mag_banners').single();
-    if (!error && data) {
-      magBannerImages = JSON.parse(data.value || '[]');
-    }
-  } catch(e) {}
-  if (!magBannerImages.length) {
-    const local = localStorage.getItem('mag_banner_images');
-    if (local) {
-      const parsed = JSON.parse(local);
-      // migrate old string-array to object-array
-      magBannerImages = parsed.map(x => typeof x === 'string' ? { desktop: x, mobile: x } : x);
-    }
-  }
-}
-
-async function saveMagBanners() {
-  localStorage.setItem('mag_banner_images', JSON.stringify(magBannerImages));
-  try {
-    await sb.from('settings').upsert({ key: 'mag_banners', value: JSON.stringify(magBannerImages) });
-  } catch(e) {}
-}
-
-function isMobile() { return window.innerWidth <= 768; }
-
-function renderMagBannerSlider() {
-  const slider = document.getElementById('mag-banner-slider');
-  const track  = document.getElementById('mag-banner-track');
-  const dots   = document.getElementById('mag-banner-dots');
-  if (!slider || !track) return;
-  if (!magBannerImages.length) { slider.style.display = 'none'; return; }
-
-  slider.style.display = 'block';
-  track.innerHTML = magBannerImages.map(b => {
-    const src = (isMobile() && b.mobile) ? b.mobile : b.desktop;
-    return `<img src="${src}" alt="banner" loading="lazy"/>`;
-  }).join('');
-  dots.innerHTML = magBannerImages.map((_,i) =>
-    `<button class="mag-banner-dot ${i===0?'active':''}" onclick="magBannerGoTo(${i})"></button>`
-  ).join('');
-
-  magBannerGoTo(0);
-  clearInterval(magBannerTimer);
-  if (magBannerImages.length > 1) magBannerTimer = setInterval(() => magBannerSlide(1), 4500);
-}
-
-window.addEventListener('resize', () => {
-  if (document.getElementById('mag-banner-slider')?.style.display !== 'none') renderMagBannerSlider();
-});
-
-function magBannerGoTo(idx) {
-  const track = document.getElementById('mag-banner-track');
-  if (!track) return;
-  magBannerIdx = (idx + magBannerImages.length) % magBannerImages.length;
-  track.style.transform = `translateX(-${magBannerIdx * 100}vw)`;
-  document.querySelectorAll('.mag-banner-dot').forEach((d,i) => d.classList.toggle('active', i === magBannerIdx));
-}
-
-function magBannerSlide(dir) { magBannerGoTo(magBannerIdx + dir); }
-
-async function uploadBannerFile(file, type, idx) {
-  // type = 'desktop' | 'mobile'
-  const ext = file.name.split('.').pop();
-  const fileName = `mag-banners/${type}_${Date.now()}.${ext}`;
-  try {
-    const { error } = await sb.storage.from(BUCKET).upload(fileName, file, { upsert: true, contentType: file.type });
-    if (error) throw error;
-    return `${STORAGE_URL}${fileName}`;
-  } catch(e) {
-    return URL.createObjectURL(file);
-  }
-}
-
-async function submitMagBanner() {
-  const desktopFile = document.getElementById('banner-desktop-file').files[0];
-  const mobileFile  = document.getElementById('banner-mobile-file').files[0];
-  if (!desktopFile) { alert('Please select at least a desktop image / اختر صورة الكمبيوتر'); return; }
-
-  const btn    = document.getElementById('banner-upload-btn');
-  const status = document.getElementById('banner-upload-status');
-  btn.disabled = true; btn.textContent = 'Uploading...';
-  status.style.display = 'inline'; status.style.color = 'var(--green)'; status.textContent = '⏳ Uploading images...';
-
-  await addMagBanner(desktopFile, mobileFile || null);
-
-  btn.disabled = false; btn.innerHTML = '<i class="ti ti-upload"></i> Upload & Add / ارفع وأضف';
-  status.style.color = '#2d6a3f'; status.textContent = '✅ Done!';
-  document.getElementById('banner-desktop-file').value = '';
-  document.getElementById('banner-mobile-file').value = '';
-  document.getElementById('banner-desktop-name').textContent = 'Choose file';
-  document.getElementById('banner-mobile-name').textContent = 'Choose file';
-  setTimeout(() => { status.style.display = 'none'; }, 3000);
-}
-
-async function addMagBanner(desktopFile, mobileFile) {
-  const desktopUrl = desktopFile ? await uploadBannerFile(desktopFile, 'desktop', Date.now()) : '';
-  const mobileUrl  = mobileFile  ? await uploadBannerFile(mobileFile,  'mobile',  Date.now()) : desktopUrl;
-  magBannerImages.push({ desktop: desktopUrl, mobile: mobileUrl });
-  await saveMagBanners();
-  renderMagBannerDashList();
-  renderMagBannerSlider();
-}
-
-function deleteMagBanner(idx) {
-  magBannerImages.splice(idx, 1);
-  saveMagBanners();
-  renderMagBannerDashList();
-  renderMagBannerSlider();
-}
-
-function renderMagBannerDashList() {
-  const list = document.getElementById('mag-banner-dash-list');
-  if (!list) return;
-  if (!magBannerImages.length) {
-    list.innerHTML = '<p style="font-size:12px;color:var(--muted)">No banners yet / لا توجد بانرات</p>';
-    return;
-  }
-  list.innerHTML = magBannerImages.map((b, i) => `
-    <div style="background:#f8f8f8;border-radius:12px;padding:.75rem;display:flex;gap:.75rem;align-items:center;width:100%;margin-bottom:.5rem">
-      <div style="flex:1">
-        <p style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600">🖥️ Desktop</p>
-        <img src="${b.desktop}" style="width:100%;height:55px;object-fit:cover;border-radius:7px;background:#eee" onerror="this.style.background='#eee'"/>
-      </div>
-      <div style="flex:1">
-        <p style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600">📱 Mobile</p>
-        <img src="${b.mobile||b.desktop}" style="width:100%;height:55px;object-fit:cover;border-radius:7px;background:#eee" onerror="this.style.background='#eee'"/>
-      </div>
-      <button onclick="deleteMagBanner(${i})" style="background:#fce4e4;color:#a33;border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-trash"></i></button>
-    </div>`).join('');
 }
 
 // ═══ ARTICLE IMAGE UPLOAD ═══
