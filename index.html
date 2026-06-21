@@ -1266,7 +1266,7 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
   </div>
 
   <!-- MAGAZINE BANNER SLIDER -->
-  <div class="mag-banner-slider" id="mag-banner-slider" style="display:none">
+  <div class="mag-banner-slider" id="mag-banner-slider" dir="ltr" style="display:none">
     <div class="mag-banner-track" id="mag-banner-track"></div>
     <button class="mag-banner-arrow prev" onclick="magBannerSlide(-1)"><i class="ti ti-chevron-left"></i></button>
     <button class="mag-banner-arrow next" onclick="magBannerSlide(1)"><i class="ti ti-chevron-right"></i></button>
@@ -2287,6 +2287,7 @@ function renderMagBannerSlider() {
   if (!magBannerImages.length) { slider.style.display = 'none'; return; }
 
   slider.style.display = 'block';
+  slider.dir = 'ltr';
   track.innerHTML = magBannerImages.map(b => {
     const src = (isMobile() && b.mobile) ? b.mobile : b.desktop;
     return `<img src="${src}" alt="banner" loading="lazy"/>`;
