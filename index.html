@@ -833,8 +833,11 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
 <div id="page-about" class="page">
   <div class="shop-header"><p class="sec-tag">Our Story</p><h2 class="sec-title">Ayo Delight Natural Products</h2></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:4rem 2.5rem">
-    <div style="background:var(--green-light);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center">
-      <svg viewBox="0 0 240 180" width="220"><circle cx="120" cy="90" r="70" fill="#D4E8C2"/><g fill="#7DB55A" opacity=".6"><ellipse cx="120" cy="48" rx="10" ry="24"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(30 120 48)"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(-30 120 48)"/></g><text x="120" y="125" text-anchor="middle" font-size="14" fill="#5A8A3A" font-family="serif" font-weight="600">Ayo Delight</text><text x="120" y="142" text-anchor="middle" font-size="10" fill="#7A8A72" font-family="sans-serif">Natural Products</text></svg>
+    <div id="about-img-wrap" style="background:var(--green-light);aspect-ratio:4/3;overflow:hidden;border-radius:16px;display:flex;align-items:center;justify-content:center">
+      <img id="about-main-img" src="" alt="Ayo Delight" style="width:100%;height:100%;object-fit:cover;display:none" onerror="this.style.display='none';document.getElementById('about-img-placeholder').style.display='flex'" onload="this.style.display='block';document.getElementById('about-img-placeholder').style.display='none'"/>
+      <div id="about-img-placeholder" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+        <svg viewBox="0 0 240 180" width="220"><circle cx="120" cy="90" r="70" fill="#D4E8C2"/><g fill="#7DB55A" opacity=".6"><ellipse cx="120" cy="48" rx="10" ry="24"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(30 120 48)"/><ellipse cx="120" cy="48" rx="10" ry="24" transform="rotate(-30 120 48)"/></g><text x="120" y="125" text-anchor="middle" font-size="14" fill="#5A8A3A" font-family="serif" font-weight="600">Ayo Delight</text><text x="120" y="142" text-anchor="middle" font-size="10" fill="#7A8A72" font-family="sans-serif">Natural Products</text></svg>
+      </div>
     </div>
     <div>
       <h3 style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;margin-bottom:1rem">Why Ayo Delight?</h3>
@@ -1316,7 +1319,11 @@ footer{background:var(--dark);color:#fff;padding:3rem 2.5rem 1.5rem}
         <input type="hidden" id="art-image"/>
         <div id="art-img-upload-status" style="margin-top:.5rem;font-size:12px;display:none"></div>
       </div>
-      <div class="form-group"><label>YouTube Video URL (optional) / رابط يوتيوب (اختياري)</label><input type="text" id="art-video" placeholder="https://www.youtube.com/watch?v=..."/></div>
+      <div class="form-group">
+        <label>YouTube Video URL (optional) / رابط يوتيوب (اختياري)</label>
+        <input type="text" id="art-video" placeholder="https://www.youtube.com/watch?v=..." oninput="previewArticleVideo()"/>
+        <div id="art-video-preview" style="display:none"></div>
+      </div>
       <div class="form-group"><label>Content (English)</label><textarea id="art-body-en" rows="5" placeholder="Write article content in English..."></textarea></div>
       <div class="form-group"><label>المحتوى (عربي)</label><textarea id="art-body-ar" rows="5" placeholder="اكتبي محتوى المقال بالعربي..." dir="rtl"></textarea></div>
       <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:.5rem">
@@ -2478,6 +2485,7 @@ function openArticleModal(id = null) {
     document.getElementById('art-title-en').value = a.title_en || '';
     document.getElementById('art-title-ar').value = a.title_ar || '';
     document.getElementById('art-video').value = a.video_url || '';
+    setTimeout(previewArticleVideo, 100);
     document.getElementById('art-body-en').value = a.body_en || '';
     document.getElementById('art-body-ar').value = a.body_ar || '';
     document.getElementById('art-image').value = a.image || '';
@@ -2499,6 +2507,8 @@ function openArticleModal(id = null) {
 
 function closeArticleModal() {
   document.getElementById('article-modal').classList.remove('open');
+  document.getElementById('art-video-preview').innerHTML = '';
+  document.getElementById('art-video-preview').style.display = 'none';
   editingArticleId = null;
 }
 
@@ -2588,8 +2598,33 @@ function renderArticlesTable() {
 
 function getYouTubeId(url) {
   if (!url) return null;
-  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
-  return m ? m[1] : null;
+  url = url.trim();
+  // Handle all YouTube URL formats
+  const patterns = [
+    /[?&]v=([a-zA-Z0-9_-]{11})/,           // youtube.com/watch?v=ID
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,       // youtu.be/ID
+    /embed\/([a-zA-Z0-9_-]{11})/,           // youtube.com/embed/ID
+    /shorts\/([a-zA-Z0-9_-]{11})/,          // youtube.com/shorts/ID
+    /live\/([a-zA-Z0-9_-]{11})/,            // youtube.com/live/ID
+    /^([a-zA-Z0-9_-]{11})$/                 // raw ID
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function previewArticleVideo() {
+  const url = document.getElementById('art-video').value.trim();
+  const preview = document.getElementById('art-video-preview');
+  const ytId = getYouTubeId(url);
+  if (ytId) {
+    preview.innerHTML = `<div class="art-video-wrap" style="margin-top:.75rem;border-radius:10px;overflow:hidden"><iframe src="https://www.youtube.com/embed/${ytId}" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"></iframe></div>`;
+    preview.style.display = 'block';
+  } else {
+    preview.innerHTML = url ? '<p style="font-size:11px;color:#a33;margin-top:.5rem">⚠️ Invalid YouTube URL / رابط غير صحيح</p>' : '';
+  }
 }
 
 function openArticle(id) {
