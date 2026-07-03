@@ -2794,26 +2794,35 @@ function closeSearch(e) {
 }
 function doSearch(query) {
   const container = document.getElementById('search-results');
-  query = query.trim().toLowerCase();
-  if (!query) { container.innerHTML = '<p class="search-empty">Start typing to search / ابدأ الكتابة للبحث</p>'; return; }
+  const q = query.trim();
+  if (!q) { container.innerHTML = '<p class=\"search-empty\">Start typing to search / ابدأ الكتابة للبحث</p>'; return; }
+  const ql = q.toLowerCase();
   const results = allProducts.filter(p =>
-    (p.name && p.name.toLowerCase().includes(query)) ||
-    (p.name_ar && p.name_ar.includes(query)) ||
-    (p.description && p.description.toLowerCase().includes(query)) ||
-    (p.category && p.category.toLowerCase().includes(query))
+    (p.name && p.name.toLowerCase().includes(ql)) ||
+    (p.name_ar && p.name_ar.includes(q)) ||
+    (p.description && p.description.toLowerCase().includes(ql)) ||
+    (p.description_ar && p.description_ar.includes(q)) ||
+    (p.category && p.category.toLowerCase().includes(ql))
   );
-  if (!results.length) { container.innerHTML = '<p class="search-empty">No products found / لا توجد نتائج</p>'; return; }
+  if (!results.length) { container.innerHTML = '<p class=\"search-empty\">No products found / لا توجد نتائج</p>'; return; }
   container.innerHTML = results.map(p => {
     const img = (p.images && p.images[0]) || p.image_url || '';
     const name = currentLang === 'ar' && p.name_ar ? p.name_ar : (p.name || '');
-    return `<div class="search-result-item" onclick="closeSearchPanel();showProduct(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-      ${img ? `<img src="${img}" alt="${name}" onerror="this.style.display='none'"/>` : `<div style="width:46px;height:46px;border-radius:8px;background:${p.color||'#7DB55A'}22;display:flex;align-items:center;justify-content:center"><i class="ti ti-leaf" style="color:${p.color||'#7DB55A'}"></i></div>`}
-      <div class="search-result-info">
-        <div class="search-result-name">${name}</div>
-        <div class="search-result-price">EGP ${p.price || ''}</div>
+    return `<div class=\"search-result-item\" data-pid=\"${p.id}\" onclick=\"handleSearchClick(this)\">
+      ${img ? `<img src=\"${img}\" alt=\"${name}\" onerror=\"this.style.display='none'\"/>` : `<div style=\"width:46px;height:46px;border-radius:8px;background:${p.color||'#7DB55A'}22;display:flex;align-items:center;justify-content:center\"><i class=\"ti ti-leaf\" style=\"color:${p.color||'#7DB55A'}\"></i></div>`}
+      <div class=\"search-result-info\">
+        <div class=\"search-result-name\">${name}</div>
+        <div class=\"search-result-price\">EGP ${p.price || ''}</div>
       </div>
     </div>`;
   }).join('');
+}
+function handleSearchClick(el) {
+  const pid = el.dataset.pid;
+  const p = allProducts.find(x => String(x.id) === String(pid));
+  if (!p) return;
+  closeSearchPanel();
+  showProduct(p);
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSearchPanel(); });
 
